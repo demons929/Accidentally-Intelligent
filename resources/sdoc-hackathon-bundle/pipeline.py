@@ -1,11 +1,8 @@
 import json
 import re
 from loader import Inbox
-<<<<<<< HEAD
-=======
 import io
 from pathlib import Path
->>>>>>> d9b3d766d193e3a6950a6a68cf24e88c15870f18
 
 # ─── Field Aliases & Patterns ──────────────────────────────────────
 FIELD_ALIASES = {
@@ -20,8 +17,6 @@ FIELD_ALIASES = {
 
 REQUIRED_FIELDS = list(FIELD_ALIASES.keys())
 
-<<<<<<< HEAD
-=======
 def extract_text_from_attachment(inbox, att_path):
     """Reads .txt, .xlsx, .docx, and .pdf files and returns plain text."""
     try:
@@ -67,7 +62,6 @@ def extract_text_from_attachment(inbox, att_path):
         print(f"⚠️ Error reading {att_path}: {e}")
         return ""
     
->>>>>>> d9b3d766d193e3a6950a6a68cf24e88c15870f18
 def normalize_value(field, value):
     """Clean up extracted values for better comparison."""
     if not value: return ""
@@ -156,10 +150,6 @@ def compare_si_bl(si_text, bl_text):
         return {"status": "MISMATCH", "review_reason": None, "has_defect": True, "defect_fields": defect_fields}
     
     return {"status": "OK", "review_reason": None, "has_defect": False, "defect_fields": []}
-<<<<<<< HEAD
-=======
-
->>>>>>> d9b3d766d193e3a6950a6a68cf24e88c15870f18
 def run_pipeline(source="resources/sdoc-hackathon-bundle"):
     print(f"🔍 Initializing Inbox from: {source}")
     try:
@@ -191,17 +181,6 @@ def run_pipeline(source="resources/sdoc-hackathon-bundle"):
             bl_text = ""
             
             for att in email.get("attachments", []):
-<<<<<<< HEAD
-                try:
-                    if "si" in att.lower():
-                        si_text = inbox.read_text(att)
-                    if "bl" in att.lower():
-                        bl_text = inbox.read_text(att)
-                except Exception as e:
-                    print(f"   ⚠️ Could not read attachment {att}: {e}")
-
-            # Fallback to body if SI attachment is missing/unreadable
-=======
                 content = extract_text_from_attachment(inbox, att)
                 
                 if "si" in att.lower():
@@ -210,16 +189,11 @@ def run_pipeline(source="resources/sdoc-hackathon-bundle"):
                     bl_text = content
 
             # Fallback: Check email body for SI if no attachment found or failed
->>>>>>> d9b3d766d193e3a6950a6a68cf24e88c15870f18
             if not si_text and "shipper" in email.get("body", "").lower():
                 si_text = email["body"]
 
             if not si_text or not bl_text:
-<<<<<<< HEAD
-                entry.update({"status": "NEEDS_REVIEW", "review_reason": "missing_attachment"})
-=======
                 entry.update({"status": "NEEDS_REVIEW", "review_reason": "unreadable"})
->>>>>>> d9b3d766d193e3a6950a6a68cf24e88c15870f18
             else:
                 cmp = compare_si_bl(si_text, bl_text)
                 entry.update(cmp)
