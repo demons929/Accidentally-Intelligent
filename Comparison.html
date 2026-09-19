@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HarryPort | Comparison Requests</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{
+navy:{DEFAULT:'#182536',dark:'#0f1824',light:'#23344a',surface:'#1c2d42'},
+gold:{DEFAULT:'#C6A15B',light:'#d9b675',dark:'#a8833e',muted:'#e6cf9c'},
+ivory:{DEFAULT:'#F2E9DA',light:'#faf6ee',card:'#f9f4ec',dark:'#e3d6be'}
+}}}};
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#182536;--gold:#C6A15B;--ivory:#F2E9DA}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536}
+.gold-gradient{background:linear-gradient(135deg,#d9b675 0%,#C6A15B 50%,#9e7a35 100%)}
+.gold-border{border-color:rgba(198,161,91,.35)}
+.gold-border-solid{border-color:#C6A15B}
+.gold-text{color:#C6A15B}
+.gold-active-nav{background:linear-gradient(90deg,rgba(198,161,91,.15),rgba(198,161,91,.02));border-left:4px solid #C6A15B;color:#C6A15B}.category-active{background:linear-gradient(90deg,rgba(198,161,91,.15),rgba(198,161,91,.02));border-left:3px solid #C6A15B;color:#C6A15B}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:rgba(242,233,218,.3)}
+::-webkit-scrollbar-thumb{background:rgba(198,161,91,.4);border-radius:4px}
+.request-row{transition:.15s}
+.request-filter-bar{position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);scroll-margin-top:0;}
+.request-row:hover{background:#faf6ee}
+.status{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:6px 11px;border-radius:9px;font-size:10px;font-weight:800;white-space:nowrap;box-sizing:border-box}.status.result-status{width:100px;min-width:100px;flex:0 0 100px;font-size:9px;padding:5px 7px}.status.progress-status{width:136px}
+.completed{background:#e9f8f0;color:#14734f;border:1px solid #bde8d2}
+.match{background:#e9f8f0;color:#14734f;border:1px solid #bde8d2}
+.incompleted{background:#fff0f0;color:#8b2e25;border:1px solid #e8b8b3}
+.mismatch{background:#ffe4e1;color:#9f1d16;border:1px solid #e58f88}
+.review{background:#fff5df;color:#9a6200;border:1px solid #efd18d}
+/* Comparison table row treatments */
+#comparison-table{display:flex;flex-direction:column;gap:10px;padding:14px 18px;background:#f7faf9;box-sizing:border-box}
+#comparison-table .field-row{border:1px solid #b8ddd7;border-radius:10px;overflow:hidden;box-shadow:0 2px 7px rgba(24,37,54,.06);border-bottom:1px solid #b8ddd7}
+#comparison-table .field-row .cell{min-height:67px}
+#comparison-table .cell:last-child{justify-content:center}
+#comparison-table .status.review{width:100px;min-width:100px;flex:0 0 100px;font-size:9px;padding:5px 7px}
+.match-row-dark{background:linear-gradient(90deg,#d2eeea 0%,#dff5f1 100%);color:#145b56}
+.match-row-dark .field-name,.match-row-dark .field-value{color:#145b56}
+.match-row-dark .cell+.cell{border-left-color:rgba(20,91,86,.12)}
+.match-row-dark .cell{border-bottom-color:rgba(20,91,86,.08)}
+.match-row-dark .bg-ivory-light,.match-row-dark .bg-emerald-50\/60{background:transparent!important}
+.match-row-dark .status.match{background:#bfe4de;color:#0d5954;border-color:#9bcfc7}
+.match-row-light{background:linear-gradient(90deg,#e8f7f4 0%,#f1fbf9 100%);border-color:#c5e5df!important}
+.match-row-light .field-name,.match-row-light .field-value{color:#1e6862}
+.match-row-light .cell+.cell{border-left-color:rgba(30,104,98,.10)}
+.match-row-light .bg-ivory-light,.match-row-light .bg-emerald-50\/60{background:transparent!important}
+.match-row-light .status.match{background:#d3eee9;color:#14635c;border-color:#b5ddd6}
+.mismatch-row{background:linear-gradient(90deg,#efaaa4 0%,#f6beb8 100%);border-color:#d96c64!important}
+.mismatch-row .field-name,.mismatch-row .field-value{color:#80150f}
+.mismatch-row .cell+.cell{border-left-color:rgba(128,21,15,.12)}
+.mismatch-row .cell{border-bottom-color:rgba(128,21,15,.08)}
+.mismatch-row .bg-rose-50\/80,.mismatch-row .bg-rose-100\/80{background:transparent!important}
+.mismatch-row .bg-ivory-light{background:rgba(255,255,255,.10)!important}
+.mismatch-row .status.mismatch{background:#ffd8d4;color:#971b14;border-color:#d96c64}
+.review-row{background:linear-gradient(90deg,#fff0cf 0%,#fff7e5 100%);border-color:#ecd08f!important}
+.review-row .field-name,.review-row .field-value{color:#815800}
+.review-row .cell+.cell{border-left-color:rgba(129,88,0,.10)}
+.review-row .bg-ivory-light,.review-row .bg-amber-50,.review-row .bg-amber-100\/70{background:transparent!important}
+.review-row .status.review{background:#ffe5ae;color:#8a5b00;border-color:#e6bf69}
+.filter-active{background:#182536!important;color:#C6A15B!important;border-color:#C6A15B!important}
+.comparison-grid{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) 110px;width:calc(100% - 36px);margin:0 18px;min-width:0;box-sizing:border-box}
+#verification-summary{display:grid;grid-template-columns:minmax(280px,.72fr) minmax(340px,1.28fr);gap:14px;align-items:stretch;width:100%;min-width:0;overflow:visible}
+.comparison-result-card{display:flex;flex-direction:column;min-height:100%;}
+.comparison-action{margin-top:auto;display:flex;align-items:center;gap:14px;padding:20px 18px;min-height:112px;border-radius:16px;border:1px solid rgba(198,161,91,.22);}
+.comparison-action .action-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:15px;}
+.comparison-action .action-title{font-size:14px;font-weight:800;margin:0;color:#182536;}
+.comparison-action .action-copy{font-size:12px;line-height:1.55;margin-top:5px;color:rgba(24,37,54,.58);}
+.comparison-action.review-action{background:#fff8e8;border-color:#efd18d;}
+.comparison-action.review-action .action-icon{background:#fff0c9;color:#9a6200;}
+.comparison-action.completed-action{background:#effaf4;border-color:#bde8d2;}
+.comparison-action.completed-action .action-icon{background:#d9f4e6;color:#14734f;}
+
+#verification-summary > *{min-width:0}
+.field-status-card{background:#fff;border:1px solid rgba(198,161,91,.35);border-radius:12px;box-shadow:0 2px 8px rgba(24,37,54,.05);overflow:hidden;width:100%;max-width:none;justify-self:stretch;align-self:stretch;height:100%}
+.field-status-card .status-row{display:grid;grid-template-columns:minmax(0,1fr) 108px;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid rgba(198,161,91,.14);background:#fbfaf7}
+.field-status-card .status-row:first-child{border-top:0}
+.field-status-card .status-row .field-label{font-size:10px;font-weight:800;color:#182536;min-width:0}
+.field-status-card .status-row.match-line{background:linear-gradient(90deg,#edf9f6,#f8fcfb)}
+.field-status-card .status-row.mismatch-line{background:linear-gradient(90deg,#fff0ee,#fff7f5)}
+.field-status-card .status-row.review-line{background:linear-gradient(90deg,#fff7e7,#fffaf1)}
+.field-status-card .mini-status{width:108px;justify-self:end;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:5px 6px;border-radius:9px;font-size:9px;font-weight:800;box-sizing:border-box;white-space:nowrap}
+@media(max-width:700px){#verification-summary{grid-template-columns:1fr}.field-status-card{width:100%;max-width:none;justify-self:stretch}.field-status-card .status-row{grid-template-columns:minmax(0,1fr) 112px}.field-status-card .mini-status{width:112px}}
+.field-row{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) 110px;width:100%;min-width:0;border-bottom:1px solid rgba(198,161,91,.18)}
+.field-row:last-child{border-bottom:0}
+.cell{padding:16px 18px;min-height:68px;display:flex;align-items:center;min-width:0;overflow-wrap:anywhere}
+.cell+.cell{border-left:1px solid rgba(198,161,91,.18)}
+.field-name{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:#18253699;margin-bottom:0}
+.field-value{font-size:15px;font-weight:700;color:#182536}
+</style>
+</head>
+
+<body class="h-screen w-screen flex overflow-hidden">
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="w-64 bg-navy text-ivory flex flex-col justify-between h-full border-r gold-border shrink-0 shadow-xl transition-all duration-300">
+<div>
+<div class="h-16 flex items-center px-4 border-b gold-border bg-navy-dark/40">
+<div class="flex items-center space-x-3 overflow-hidden">
+<img src="resources/image/logo.png" alt="HarryPort Logo" onerror="this.style.display='none'" class="h-9 w-9 object-contain shrink-0">
+<span id="brand-text" class="font-extrabold text-lg tracking-wide whitespace-nowrap">Harry<span class="gold-text">Port</span></span>
+</div>
+</div>
+
+<nav class="p-3 space-y-1.5">
+<button onclick="showInbox()" id="nav-inbox" class="w-full flex items-center p-2.5 text-ivory/80 hover:text-ivory hover:bg-navy-light/50 font-semibold rounded-xl transition">
+<i class="fa-solid fa-inbox w-6 text-center gold-text"></i>
+<span class="sidebar-text ml-3 text-sm">Inbox</span>
+</button>
+
+<button onclick="showHumanReview()" id="nav-review" class="w-full flex items-center p-2.5 text-ivory/80 hover:text-ivory hover:bg-navy-light/50 font-semibold rounded-xl transition">
+<i class="fa-solid fa-triangle-exclamation w-6 text-center gold-text"></i>
+<span class="sidebar-text ml-3 text-sm">Human Review</span>
+<span class="sidebar-text ml-auto gold-gradient text-navy-dark text-xs font-black py-0.5 px-2 rounded-full">2</span>
+</button>
+</nav>
+
+<div class="px-3 py-2 mt-2">
+<div class="flex items-center justify-between px-2 mb-2">
+<p class="sidebar-text text-[11px] font-extrabold gold-text uppercase tracking-widest">Categories</p>
+<span class="sidebar-text text-[10px] text-ivory/50 font-mono">LIVE COUNT</span>
+</div>
+<ul class="space-y-1">
+<li>
+<button onclick="showRequests()" id="category-comparison" class="w-full flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg hover:bg-navy-light/50 transition text-left">
+<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-gold mr-3"></span><span class="sidebar-text text-xs">Comparison requests</span></div>
+<span class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">6</span>
+</button>
+</li>
+<li class="flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg">
+<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 mr-3"></span><span class="sidebar-text text-xs">New SI requests</span></div>
+<span class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">3</span>
+</li>
+<li class="flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg">
+<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-600 mr-3"></span><span class="sidebar-text text-xs">Invoice queries</span></div>
+<span class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">2</span>
+</li>
+<li class="flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg">
+<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-slate-400 mr-3"></span><span class="sidebar-text text-xs">General mail</span></div>
+<span class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">4</span>
+</li>
+<li class="flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg">
+<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-3"></span><span class="sidebar-text text-xs">Spam</span></div>
+<span class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">1</span>
+</li>
+</ul>
+</div>
+</div>
+
+<div class="p-3 border-t gold-border space-y-1 bg-navy-dark/30">
+<button class="w-full flex items-center p-2 text-ivory/80 hover:text-gold hover:bg-navy-light/50 rounded-lg">
+<i class="fa-solid fa-gear w-6 text-center gold-text"></i><span class="sidebar-text ml-3 text-sm font-semibold">Settings</span>
+</button>
+<button class="w-full flex items-center p-2 text-rose-300 hover:bg-rose-950/40 rounded-lg">
+<i class="fa-solid fa-arrow-right-from-bracket w-6 text-center"></i><span class="sidebar-text ml-3 text-sm font-semibold">Log Out</span>
+</button>
+</div>
+</aside>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-ivory">
+
+<!-- HEADER -->
+<header class="h-16 bg-navy text-ivory flex items-center justify-between px-6 border-b gold-border shrink-0 shadow-md">
+<div class="flex items-center space-x-4">
+<button onclick="toggleSidebar()" class="text-ivory/80 hover:text-gold p-2 rounded-lg hover:bg-navy-light/50">
+<i class="fa-solid fa-bars text-lg"></i>
+</button>
+<div>
+<h1 id="page-title" class="font-extrabold text-lg tracking-wide">Comparison Requests</h1>
+<span class="text-[10px] text-gold font-semibold">Shipping Instruction / Bill of Lading</span>
+</div>
+</div>
+
+<div class="flex items-center space-x-4">
+<button class="p-2 text-ivory/80 hover:text-gold"><i class="fa-solid fa-bell text-lg"></i></button>
+<div class="h-6 w-px bg-gold/20"></div>
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl gold-gradient text-navy-dark flex items-center justify-center font-black">C</div>
+<div class="hidden sm:block">
+<p class="text-xs font-bold">Captain</p>
+<p class="text-[10px] text-gold">Port Administrator</p>
+</div>
+</div>
+</div>
+</header>
+
+<div id="app-scroll" class="flex-1 overflow-y-auto p-6 bg-ivory" style="scroll-padding-top:0;">
+
+<!-- INBOX LANDING -->
+<section id="inbox-view" class="max-w-6xl mx-auto">
+  <div class="bg-white rounded-2xl border gold-border shadow-md p-8 text-center mt-6">
+    <div class="w-14 h-14 rounded-2xl bg-navy text-gold flex items-center justify-center mx-auto mb-4">
+      <i class="fa-solid fa-inbox text-xl"></i>
+    </div>
+    <h2 class="text-xl font-extrabold text-navy">Inbox</h2>
+    <p class="text-xs text-navy/55 mt-2">Select a category from the sidebar to view the corresponding requests.</p>
+  </div>
+</section>
+
+<!-- REQUEST LIST -->
+<section id="request-view" class="max-w-6xl mx-auto space-y-4">
+
+<div class="flex items-end justify-between">
+<div>
+<div class="flex items-center gap-2 text-[11px] text-navy/50 font-semibold mb-1">
+<span>Inbox</span><i class="fa-solid fa-chevron-right text-[8px]"></i><span class="gold-text">Comparison requests</span>
+</div>
+<h2 class="text-xl font-extrabold">Comparison Requests</h2>
+<p class="text-xs text-navy/60 mt-1">All matching requests and reviewed corrections are shown under Completed; unresolved issues remain under Incompleted.</p>
+</div>
+<div class="text-xs text-navy/50 font-mono" id="request-count">6 requests</div>
+</div>
+
+<!-- REQUEST FILTERS -->
+<div class="request-filter-bar bg-white rounded-2xl border gold-border shadow-md p-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-3" id="status-filters">
+      <div class="flex items-center gap-2">
+        <label for="progress-filter" class="text-[10px] font-extrabold uppercase tracking-wider text-navy/45">Processing</label>
+        <select id="progress-filter" onchange="setProgressFilter(this.value)" class="px-3 py-2 rounded-xl border border-gold/30 bg-white text-[10px] font-extrabold text-navy outline-none focus:border-gold">
+          <option value="all">All</option>
+          <option value="completed">Completed</option>
+          <option value="incompleted">Incompleted</option>
+        </select>
+      </div>
+      <div class="flex items-center gap-2">
+        <label for="result-filter" class="text-[10px] font-extrabold uppercase tracking-wider text-navy/45">Result</label>
+        <select id="result-filter" onchange="setResultFilter(this.value)" class="px-3 py-2 rounded-xl border border-gold/30 bg-white text-[10px] font-extrabold text-navy outline-none focus:border-gold">
+          <option value="all">All</option>
+          <option value="match">Match</option>
+          <option value="mismatch">Mismatch</option>
+          <option value="review">Review Needed</option>
+        </select>
+      </div>
+    </div>
+    <div class="relative w-full sm:w-72">
+      <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-navy/35 text-xs"></i>
+      <input id="search" oninput="renderRequests()" placeholder="Search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full pl-9 pr-3 py-2.5 rounded-xl border gold-border bg-ivory-light text-xs outline-none focus:border-gold" />
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL TITLE LIST -->
+<div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+  <div class="bg-navy px-5 py-3 border-b gold-border flex items-center justify-between">
+    <div>
+      <span class="text-xs font-bold text-gold uppercase tracking-wider">Comparison Requests</span>
+      <p class="text-[10px] text-ivory/50 mt-1">Click an email to open document verification.</p>
+    </div>
+    <span id="visible-status-count" class="text-[10px] text-ivory/60">6 requests</span>
+  </div>
+  <div id="request-list"></div>
+</div>
+
+</section>
+
+<!-- HUMAN REVIEW -->
+<section id="human-review-view" class="hidden max-w-6xl mx-auto space-y-5">
+
+<div class="flex items-end justify-between">
+  <div>
+    <div class="flex items-center gap-2 text-[11px] text-navy/50 font-semibold mb-1">
+      <span>Human Review</span><i class="fa-solid fa-chevron-right text-[8px]"></i><span id="review-breadcrumb-id" class="gold-text">Review Queue</span>
+    </div>
+    <h2 class="text-xl font-extrabold">Human Review</h2>
+    <p class="text-xs text-navy/60 mt-1">Upload a replacement document or manually edit extracted data. Changes are reflected in Comparison Requests after saving.</p>
+  </div>
+  <span id="review-queue-count" class="text-xs text-navy/50 font-mono">2 requests</span>
+</div>
+
+<div id="review-queue" class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden"></div>
+
+<div id="review-editor" class="hidden space-y-5">
+  <div class="flex items-center justify-between">
+    <div>
+      <button onclick="showHumanReview()" class="text-xs font-bold text-navy/60 hover:text-gold mb-3"><i class="fa-solid fa-arrow-left mr-1"></i>Back to Human Review Queue</button>
+      <h3 class="text-lg font-extrabold" id="review-editor-title">Review Request</h3>
+      <p class="text-xs text-navy/60 mt-1" id="review-editor-subtitle"></p>
+    </div>
+    <div id="review-editor-status"></div>
+  </div>
+
+  <div class="bg-white rounded-2xl border gold-border shadow-md p-5">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-[10px] uppercase tracking-widest gold-text font-extrabold">Replacement Document</p>
+        <p class="text-sm font-extrabold mt-1">Upload new file for data</p>
+        <p class="text-[10px] text-navy/50 mt-1">The prototype applies the uploaded document as the corrected BL data.</p>
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <label class="px-4 py-2.5 rounded-xl bg-navy text-gold border gold-border font-extrabold text-xs cursor-pointer hover:bg-navy-light">
+          <i class="fa-solid fa-upload mr-2"></i>Choose File
+          <input id="review-file" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" class="hidden" onchange="handleReviewFile(this)">
+        </label>
+        <button onclick="applyUploadedData()" id="apply-file-btn" disabled class="px-4 py-2.5 rounded-xl bg-gold/30 text-navy/40 border border-gold/20 font-extrabold text-xs cursor-not-allowed">
+          Apply Uploaded Data
+        </button>
+      </div>
+    </div>
+    <div id="uploaded-file-name" class="mt-3 hidden rounded-xl bg-ivory border gold-border p-3 text-xs text-navy"></div>
+  </div>
+
+  <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+    <div class="bg-navy px-5 py-4">
+      <h3 class="text-sm font-extrabold text-ivory">Manual Data Editing</h3>
+      <p class="text-[10px] text-ivory/60 mt-1">Edit the Bill of Lading values, then save and re-run the comparison.</p>
+    </div>
+    <div id="review-fields" class="p-5 space-y-3"></div>
+    <div class="px-5 pb-5 flex flex-wrap justify-end gap-2">
+      <button onclick="saveManualReview()" class="px-4 py-2.5 rounded-xl gold-gradient text-navy-dark font-extrabold text-xs shadow-sm hover:opacity-95">
+        <i class="fa-solid fa-floppy-disk mr-2"></i>Save Changes &amp; Re-check
+      </button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- VERIFICATION DETAIL -->
+<section id="verification-view" class="hidden max-w-7xl mx-auto space-y-5">
+
+<div class="flex items-center justify-between">
+<div>
+<button onclick="showRequests()" class="text-xs font-bold text-navy/60 hover:text-gold mb-3">
+<i class="fa-solid fa-arrow-left mr-1"></i> Back to Comparison Requests
+</button>
+<div class="flex items-center gap-2 text-[11px] text-navy/50 font-semibold mb-1">
+<span>Comparison requests</span><i class="fa-solid fa-chevron-right text-[8px]"></i><span id="detail-id" class="gold-text">email_511</span>
+</div>
+<h2 class="text-xl font-extrabold">Document Verification</h2>
+<p class="text-xs text-navy/60 mt-1">Field-by-field comparison between the Shipping Instruction and Bill of Lading.</p>
+</div>
+<div id="detail-status"></div>
+</div>
+
+<div class="bg-white rounded-2xl border gold-border shadow-sm p-5">
+<div class="flex flex-wrap justify-between gap-4">
+<div class="flex items-center gap-3">
+<div id="detail-avatar" class="w-11 h-11 rounded-xl bg-navy text-gold flex items-center justify-center font-black border gold-border">M</div>
+<div>
+<h3 id="detail-sender" class="font-extrabold text-sm">Maersk Freight Services</h3>
+<p id="detail-subject" class="text-xs text-navy/60 mt-1">Q3 Rate Comparison Matrix for Asia-Pacific Routes</p>
+</div>
+</div>
+<div class="text-right text-xs">
+<p id="detail-request-id" class="font-bold text-navy">Request ID: email_511</p>
+<p class="text-navy/50 mt-1">Comparison Request</p>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-3">
+<div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-ivory border gold-border text-xs">
+<i class="fa-solid fa-file-pdf text-rose-600"></i><b id="si-file">Shipping_Instruction.pdf</b>
+</div>
+<div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-ivory border gold-border text-xs">
+<i class="fa-solid fa-file-pdf text-rose-600"></i><b id="bl-file">Bill_of_Lading.pdf</b>
+</div>
+</div>
+</div>
+
+<div class="bg-navy rounded-2xl p-5 shadow-lg border border-gold/30 text-ivory">
+<div class="flex items-center gap-3">
+<div class="w-11 h-11 rounded-xl gold-gradient text-navy-dark flex items-center justify-center">
+<i class="fa-solid fa-wand-magic-sparkles"></i>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest text-gold font-extrabold">Verification Result</p>
+<h3 id="result-title" class="text-base font-extrabold mt-1">Mismatch Detected</h3>
+</div>
+</div>
+</div>
+
+<div id="verification-summary"></div>
+
+<div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+<div class="bg-navy px-5 py-4 flex items-center justify-between">
+<div>
+<h3 class="text-sm font-extrabold text-ivory">Field-by-Field Comparison</h3>
+<p class="text-[10px] text-ivory/60 mt-1">Shipping Instruction is used as the reference document.</p>
+</div>
+<div class="flex gap-2">
+<span class="status result-status match"><i class="fa-solid fa-check"></i> Match</span>
+<span class="status result-status mismatch"><i class="fa-solid fa-xmark"></i> Mismatch</span>
+</div>
+</div>
+
+<div class="comparison-grid bg-ivory border-b gold-border">
+<div class="p-4 text-xs font-extrabold uppercase tracking-wider text-navy/50 flex items-center">Field</div>
+<div class="p-4 border-l gold-border text-sm font-extrabold text-navy flex items-center"><i class="fa-solid fa-file-lines gold-text mr-2"></i>Shipping Instruction (SI)</div>
+<div class="p-4 border-l gold-border text-sm font-extrabold text-navy flex items-center"><i class="fa-solid fa-file-pdf text-rose-600 mr-2"></i>Bill of Lading (BL)</div>
+<div class="p-4 border-l gold-border text-sm font-extrabold text-navy flex items-center">Result</div>
+</div>
+
+<div id="comparison-table"></div>
+</div>
+
+
+<div id="remarks-section" class="bg-white rounded-2xl border gold-border shadow-sm p-5">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <p class="font-extrabold text-sm"><i class="fa-solid fa-message gold-text mr-2"></i>Human Review Remarks</p>
+      <p class="text-xs text-navy/60 mt-1">Remarks and edited values recorded during Human Review will appear here.</p>
+    </div>
+    <span id="remark-status" class="status review hidden"><i class="fa-solid fa-pen"></i> Updated</span>
+  </div>
+  <div id="remark-content" class="mt-4">
+    <div class="rounded-xl bg-ivory border gold-border p-4 text-xs text-navy/50">
+      No remarks or edited values have been recorded yet.
+    </div>
+  </div>
+</div>
+
+<div id="resolution-box" class="bg-white rounded-2xl border gold-border shadow-sm p-5 flex flex-wrap items-center justify-between gap-4">
+<div>
+<p class="font-extrabold text-sm" id="resolution-title">Resolution</p>
+<p class="text-xs text-navy/60 mt-1" id="resolution-text">The system found a discrepancy that requires attention.</p>
+</div>
+<div class="flex gap-2" id="resolution-actions">
+<button onclick="goToHumanReview()" class="px-4 py-2.5 rounded-xl bg-navy text-gold border gold-border font-extrabold text-xs hover:bg-navy-light">
+<i class="fa-solid fa-arrow-right mr-2"></i>Go to Human Review
+</button>
+</div>
+</div>
+
+</section>
+
+</div>
+</main>
+
+<script>
+const requests=[
+ {id:'email_511',sender:'Maersk Freight Services',subject:'Q3 Rate Comparison Matrix for Asia-Pacific Routes',status:'completed',result:'match',reviewed:false,modified:false,avatar:'M',si:'Shipping_Instruction_511.pdf',bl:'Bill_of_Lading_511.pdf',
+  siFields:['ABC Sdn Bhd','XYZ Trading Ltd','DEF Logistics','Port Klang','Singapore','3 containers','22,000 kg'],
+  blFields:['ABC Sdn Bhd','XYZ Trading Ltd','DEF Logistics','Port Klang','Singapore','3 containers','22,000 kg']},
+ {id:'email_273',sender:'Pacific Shipping Ltd.',subject:'SI and BL Verification – Shipment PS-273',status:'completed',result:'mismatch',reviewed:true,modified:true,avatar:'P',si:'SI_273.pdf',bl:'BL_273.pdf',
+  siFields:['Pacific Export Sdn Bhd','Global Imports Ltd','Ocean Logistics','Port Klang','Rotterdam','5 containers','41,000 kg'],
+  blFields:['Pacific Export Sdn Bhd','Global Imports Ltd','Ocean Logistics','Port Klang','Rotterdam','6 containers','41,000 kg'],
+  remark:'Human Review: BL container count was checked against the source document. Please confirm with the shipping team before final processing.',
+  reviewerName:'Aiman Hakim',reviewerAccount:'PRT-ADM-017',reviewerPosition:'Port Administrator',
+  editedField:'Container Count',editedValue:'5 containers'},
+ {id:'email_313',sender:'Ocean Network Express',subject:'Document Check – Vessel ON-313',status:'completed',result:'match',reviewed:false,modified:false,avatar:'O',si:'email_313_SI.pdf',bl:'email_313_BL.pdf',
+  siFields:['ONE Malaysia','Tokyo Trading','ONE Logistics','Port Klang','Tokyo','4 containers','30,500 kg'],
+  blFields:['ONE Malaysia','Tokyo Trading','ONE Logistics','Port Klang','Tokyo','4 containers','30,500 kg']},
+ {id:'email_514',sender:'Global Maritime Services',subject:'Please verify attached shipping documents',status:'review',result:'review',reviewed:true,modified:false,avatar:'G',si:'email_514_SI.pdf',bl:'email_514_BL.pdf',
+  siFields:['Global Maritime','ABC Imports','GM Logistics','Port Klang','Shanghai','3 containers','—'],
+  blFields:['Global Maritime','ABC Imports','GM Logistics','Port Klang','Shanghai','3 containers','—'],
+  remark:'Human Review: Gross Weight is missing from the BL. Source file was checked and the value could not be reliably recovered.',
+  reviewerName:'Aiman Hakim',reviewerAccount:'PRT-ADM-017',reviewerPosition:'Port Administrator'},
+ {id:'email_ES273',sender:'Eastern Star Logistics',subject:'BL Confirmation Required – ES-273',status:'mismatch',result:'mismatch',reviewed:false,modified:false,avatar:'E',si:'SI_ES273.pdf',bl:'BL_ES273.pdf',
+  siFields:['Eastern Star','Nexus Trading','ES Logistics','Tanjung Pelepas','Jakarta','2 containers','18,000 kg'],
+  blFields:['Eastern Star','Nexus Trading','ES Logistics','Tanjung Pelepas','Jakarta','2 containers','19,000 kg']},
+ {id:'email_102',sender:'Harbour Freight Co.',subject:'Shipment Documentation – HF-102',status:'review',result:'review',reviewed:false,modified:false,avatar:'H',si:'SI_HF102.pdf',bl:'—',
+  siFields:['Harbour Freight','ABC Trading','HF Logistics','Port Klang','Singapore','4 containers','25,000 kg'],
+  blFields:['Missing','Missing','Missing','Missing','Missing','Missing','Missing']}
+];
+
+let currentRequest=null;
+let progressFilter='all';
+let resultFilter='all';
+
+const statusInfo={
+ completed:{label:'Completed',icon:'fa-check'},
+ mismatch:{label:'Mismatch',icon:'fa-xmark'},
+ review:{label:'Review Needed',icon:'fa-triangle-exclamation'},
+ match:{label:'Match',icon:'fa-check'}
+};
+
+function requestIsCompleted(r){
+ return r.result==='match' || (r.reviewed && r.modified);
+}
+
+function requestDisplayStatus(r){
+ if(r.result==='match') return 'match';
+ if(requestIsCompleted(r)) return 'completed';
+ return r.result || r.status;
+}
+
+function requestRow(r){
+ const displayStatus=requestDisplayStatus(r);
+ const showReviewMarker=!!r.reviewed;
+ return `<div class="request-row px-5 py-4 border-b border-gold/15 cursor-pointer flex items-center justify-between gap-4" onclick="openVerification('${r.id}')">
+   <div class="flex items-center gap-4 min-w-0">
+     <div class="w-10 h-10 rounded-xl bg-navy text-gold font-extrabold flex items-center justify-center shrink-0 border gold-border shadow-sm">${r.avatar}</div>
+     <div class="min-w-0">
+       <div class="flex items-center gap-2">
+         <p class="font-extrabold text-sm text-navy">${r.id}</p>
+         ${showReviewMarker ? '<span title="Human Review completed" class="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[9px] border border-amber-300"><i class="fa-solid fa-pen"></i></span>' : ''}
+       </div>
+       <p class="text-xs text-navy/60 mt-1 truncate">${r.subject}</p>
+     </div>
+   </div>
+   <div class="flex items-center gap-2 shrink-0">
+     <span class="status result-status ${r.result}"><i class="fa-solid ${statusInfo[r.result].icon}"></i>${statusInfo[r.result].label}</span>
+     <span class="status progress-status ${requestIsCompleted(r)?'completed':'incompleted'}"><i class="fa-solid ${requestIsCompleted(r)?'fa-check':'fa-clock'}"></i>${requestIsCompleted(r)?'Completed':'Incompleted'}</span>
+     <i class="fa-solid fa-chevron-right text-xs text-gold ml-1"></i>
+   </div>
+ </div>`;
+}
+
+function renderRequests(){
+ const searchEl=document.getElementById('search');
+ const q=(searchEl ? searchEl.value : '').toLowerCase().trim();
+ const matches=requests.filter(r=>{
+   const text=(r.id+' '+r.sender+' '+r.subject).toLowerCase();
+   return text.includes(q);
+ });
+ const filtered=matches.filter(r=>{
+   const completed=requestIsCompleted(r);
+   const matchesProgress=progressFilter==='all' || (progressFilter==='completed' ? completed : !completed);
+   const matchesResult=resultFilter==='all' || r.result===resultFilter;
+   return matchesProgress && matchesResult;
+ });
+
+ document.getElementById('request-count').innerText=`${matches.length} request${matches.length===1?'':'s'}`;
+ document.getElementById('visible-status-count').innerText=`${filtered.length} request${filtered.length===1?'':'s'}`;
+ document.getElementById('request-list').innerHTML=filtered.map(requestRow).join('') || `<div class="p-10 text-center text-xs text-navy/50">No requests found.</div>`;
+}
+
+function setProgressFilter(value){
+ progressFilter=value;
+ renderRequests();
+}
+
+function setResultFilter(value){
+ resultFilter=value;
+ renderRequests();
+}
+
+function openVerification(id){
+ currentRequest=requests.find(r=>r.id===id);
+ if(!currentRequest)return;
+ const effectiveStatus=requestIsCompleted(currentRequest)?'completed':currentRequest.status;
+
+ document.getElementById('request-view').classList.add('hidden');
+ document.getElementById('inbox-view').classList.add('hidden');
+ document.getElementById('human-review-view').classList.add('hidden');
+ document.getElementById('verification-view').classList.remove('hidden');
+ document.getElementById('page-title').innerText='Document Verification';
+
+ document.getElementById('detail-id').innerText=currentRequest.id;
+ document.getElementById('detail-request-id').innerText='Request ID: '+currentRequest.id;
+ document.getElementById('detail-sender').innerText=currentRequest.sender;
+ document.getElementById('detail-subject').innerText=currentRequest.subject;
+ document.getElementById('detail-avatar').innerText=currentRequest.avatar;
+ document.getElementById('si-file').innerText=currentRequest.si;
+ document.getElementById('bl-file').innerText=currentRequest.bl;
+
+ const info=statusInfo[currentRequest.result==='match'?'match':effectiveStatus];
+ document.getElementById('detail-status').innerHTML=`<span class="status result-status ${currentRequest.result==='match'?'match':effectiveStatus}"><i class="fa-solid ${info.icon}"></i>${info.label}</span>`;
+
+ document.getElementById('result-title').innerText=
+   currentRequest.result==='match'?'Verification Match':effectiveStatus==='completed'?'Verification Completed':
+   currentRequest.status==='mismatch'?'Mismatch Detected':'Review Needed';
+
+ renderComparison(currentRequest);
+ renderRemarks(currentRequest);
+
+ const actions=document.getElementById('resolution-actions');
+ if(currentRequest.result==='match' || effectiveStatus==='completed'){
+   document.getElementById('resolution-title').innerText='Verification Completed';
+   document.getElementById('resolution-text').innerText=currentRequest.result==='match' ? 'All required fields match between the SI and BL.' : 'Human Review was completed and the corrected value has been applied.';
+   actions.innerHTML=`<button onclick="goToHumanReview()" class="px-4 py-2.5 rounded-xl bg-white text-navy border gold-border font-extrabold text-xs hover:bg-ivory">
+     <i class="fa-solid fa-pen-to-square mr-2"></i>Move to Human Review
+   </button>`;
+ }else if(currentRequest.status==='mismatch'){
+   document.getElementById('resolution-title').innerText='Human Review Available';
+   document.getElementById('resolution-text').innerText='This request is already in Human Review. Use the shortcut below to continue the review without searching for the email ID.';
+   actions.innerHTML=`<button onclick="goToHumanReview()" class="px-4 py-2.5 rounded-xl bg-navy text-gold border gold-border font-extrabold text-xs hover:bg-navy-light">
+     <i class="fa-solid fa-arrow-right mr-2"></i>Go to Human Review
+   </button>`;
+ }else{
+   document.getElementById('resolution-title').innerText='Human Review Required';
+   document.getElementById('resolution-text').innerText='This request is already in Human Review because the system could not reliably complete the verification.';
+   actions.innerHTML=`<button onclick="goToHumanReview()" class="px-4 py-2.5 rounded-xl bg-navy text-gold border gold-border font-extrabold text-xs hover:bg-navy-light">
+     <i class="fa-solid fa-arrow-right mr-2"></i>Go to Human Review
+   </button>`;
+ }
+}
+
+function renderComparison(r){
+ const names=['Shipper','Consignee','Notify Party','Port of Loading','Port of Discharge','Container Count','Gross Weight'];
+ let mismatchCount=0, reviewCount=0, matchCount=0, matchedRowIndex=0;
+ const rows=names.map((name,i)=>{
+   let a=r.siFields[i], b=r.blFields[i];
+   if(r.editedField===name && r.editedValue){ b=r.editedValue; }
+   const missing=(a==='—'||b==='—'||a==='Missing'||b==='Missing');
+   const same=a===b;
+   const isMismatch=!same&&!missing;
+
+   if(missing) reviewCount++;
+   else if(isMismatch) mismatchCount++;
+   else matchCount++;
+
+   let rowClass='';
+   if(missing){
+     rowClass='review-row';
+   }else if(isMismatch){
+     rowClass='mismatch-row';
+   }else{
+     rowClass=matchedRowIndex%2===0 ? 'match-row-dark' : 'match-row-light';
+     matchedRowIndex++;
+   }
+   const valueClass=missing?'text-amber-800':isMismatch?'text-rose-800':'text-navy';
+   const result=missing
+     ? `<span class="status review"><i class="fa-solid fa-triangle-exclamation"></i> Review</span>`
+     : isMismatch
+       ? `<span class="status result-status mismatch"><i class="fa-solid fa-xmark"></i> Mismatch</span>`
+       : `<span class="status result-status match"><i class="fa-solid fa-check"></i> Match</span>`;
+
+   return `<div class="field-row ${rowClass}">
+     <div class="cell bg-ivory-light"><div class="field-name">${name}</div></div>
+
+     <div class="cell ${isMismatch?'bg-rose-50/80':''} ${missing?'bg-amber-50':''}">
+       <div class="field-value ${valueClass}">${a}</div>
+     </div>
+
+     <div class="cell ${isMismatch?'bg-rose-50/80':''} ${missing?'bg-amber-50':''}">
+       <div class="field-value ${valueClass}">${b}</div>
+     </div>
+
+     <div class="cell flex items-center ${isMismatch?'bg-rose-100/80':missing?'bg-amber-100/70':'bg-emerald-50/60'}">
+       ${result}
+     </div>
+   </div>`;
+ }).join('');
+
+ document.getElementById('comparison-table').innerHTML=rows;
+
+ const total=names.length;
+ let summaryHTML='';
+ const discrepancyLabel = mismatchCount===1 ? 'discrepancy found' : 'discrepancies found';
+ const reviewLabel = reviewCount===1 ? 'field requires review' : 'fields require review';
+ const fieldStatusRows=names.map((name,i)=>{
+   let a=r.siFields[i], b=r.blFields[i];
+   if(r.editedField===name && r.editedValue){ b=r.editedValue; }
+   const missing=(a==='—'||b==='—'||a==='Missing'||b==='Missing');
+   const same=a===b;
+   const isMismatch=!same&&!missing;
+   const lineClass=missing?'review-line':isMismatch?'mismatch-line':'match-line';
+   const statusClass=missing?'review':isMismatch?'mismatch':'match';
+   const label=missing?'Review Needed':isMismatch?'Mismatch':'Match';
+   const icon=missing?'fa-triangle-exclamation':isMismatch?'fa-xmark':'fa-check';
+   return `<div class="status-row ${lineClass}">
+     <span class="field-label">${name}</span>
+     <span class="mini-status ${statusClass}"><i class="fa-solid ${icon}"></i>${label}</span>
+   </div>`;
+ }).join('');
+ summaryHTML=`
+   <div class="comparison-result-card bg-white rounded-2xl border gold-border p-5 shadow-sm">
+     <div class="flex items-center gap-3 mb-4">
+       <div class="w-10 h-10 rounded-xl bg-navy text-gold flex items-center justify-center">
+         <i class="fa-solid fa-clipboard-check"></i>
+       </div>
+       <div>
+         <p class="text-sm font-extrabold text-navy">Comparison Result</p>
+         <p class="text-[10px] text-navy/45 mt-1">Summary of the field-by-field verification.</p>
+       </div>
+     </div>
+     <div class="space-y-3 border-t border-gold/15 pt-4">
+       <div class="flex items-center gap-3">
+         <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[11px]"><i class="fa-solid fa-check"></i></span>
+         <span class="text-sm font-bold text-navy">${matchCount} / ${total} fields match</span>
+       </div>
+       ${mismatchCount ? `<div class="flex items-center gap-3">
+         <span class="w-6 h-6 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-[11px]"><i class="fa-solid fa-circle-exclamation"></i></span>
+         <span class="text-sm font-bold text-rose-700">${mismatchCount} ${discrepancyLabel}</span>
+       </div>` : ''}
+       ${reviewCount ? `<div class="flex items-center gap-3">
+         <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[11px]"><i class="fa-solid fa-triangle-exclamation"></i></span>
+         <span class="text-sm font-bold text-amber-800">${reviewCount} ${reviewLabel}</span>
+       </div>` : ''}
+       ${!mismatchCount && !reviewCount ? `<div class="flex items-center gap-3">
+         <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[11px]"><i class="fa-solid fa-check"></i></span>
+         <span class="text-sm font-bold text-emerald-700">No discrepancy found</span>
+       </div>` : ''}
+     </div>
+     <div class="comparison-action ${r.status==='completed'?'completed-action':'review-action'}">
+       <div class="action-icon"><i class="fa-solid ${r.status==='completed'?'fa-circle-check':'fa-lightbulb'}"></i></div>
+       <div class="min-w-0">
+         <p class="action-title">${r.status==='completed'?'No Action Needed':'Recommended Action'}</p>
+         <p class="action-copy">${r.status==='completed'?'All required verification checks are complete.':(reviewCount ? 'Open Human Review to resolve missing or unreliable data.' : 'Open Human Review to review and correct the highlighted discrepancy.')}</p>
+       </div>
+     </div>
+   </div>
+   <div class="field-status-card">
+     <div class="bg-navy px-4 py-3 flex items-center justify-between">
+       <div>
+         <p class="text-xs font-extrabold text-ivory">Field Status</p>
+         <p class="text-[9px] text-ivory/55 mt-0.5">Result for each compared field</p>
+       </div>
+       <span class="text-[9px] font-extrabold text-gold uppercase tracking-wider">${total} fields</span>
+     </div>
+     ${fieldStatusRows}
+   </div>`;
+ document.getElementById('verification-summary').innerHTML=summaryHTML;
+}
+
+function renderRemarks(r){
+ const content=document.getElementById('remark-content');
+ const badge=document.getElementById('remark-status');
+
+ if(r.remark || r.editedField){
+   badge.classList.remove('hidden');
+   let html='';
+   if(r.remark){
+     html+=`<div class="rounded-xl bg-ivory border gold-border p-4">
+       <div class="flex items-start gap-3 mb-3">
+         <span class="w-8 h-8 rounded-lg bg-navy text-gold flex items-center justify-center text-[11px] shrink-0"><i class="fa-solid fa-user-pen"></i></span>
+         <div class="min-w-0 flex-1">
+           <p class="text-[10px] uppercase tracking-wider font-extrabold text-navy/50">Human Review Remark</p>
+           <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-navy/70">
+             <span><i class="fa-solid fa-user mr-1 text-gold"></i><span class="font-extrabold text-navy">${r.reviewerName || 'Reviewer'}</span></span>
+             <span><i class="fa-solid fa-id-badge mr-1 text-gold"></i>${r.reviewerAccount || '—'}</span>
+             <span><i class="fa-solid fa-briefcase mr-1 text-gold"></i>${r.reviewerPosition || '—'}</span>
+           </div>
+         </div>
+       </div>
+       <p class="text-xs leading-6 text-navy/80">${r.remark}</p>
+     </div>`;
+   }
+   if(r.editedField){
+     html+=`<div class="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-4">
+       <div class="flex items-center gap-2 mb-2">
+         <i class="fa-solid fa-pen-to-square text-amber-700"></i>
+         <p class="text-[10px] uppercase tracking-wider font-extrabold text-amber-700">Edited Value</p>
+       </div>
+       <div class="flex flex-wrap gap-3 text-xs">
+         <span class="font-bold text-navy">${r.editedField}</span>
+         <span class="text-navy/40">→</span>
+         <span class="font-extrabold text-amber-800">${r.editedValue}</span>
+       </div>
+     </div>`;
+   }
+   content.innerHTML=html;
+ }else{
+   badge.classList.add('hidden');
+   content.innerHTML=`<div class="rounded-xl bg-ivory border gold-border p-4 text-xs text-navy/50">
+     No remarks or edited values have been recorded yet.
+   </div>`;
+ }
+}
+
+
+function setSidebarCategoryActive(active){
+ const el=document.getElementById('category-comparison');
+ if(el) el.classList.toggle('category-active',active);
+}
+
+function showInbox(){
+ document.getElementById('verification-view').classList.add('hidden');
+ document.getElementById('human-review-view').classList.add('hidden');
+ document.getElementById('request-view').classList.add('hidden');
+ document.getElementById('inbox-view').classList.remove('hidden');
+ document.getElementById('page-title').innerText='Inbox';
+ setSidebarCategoryActive(false);
+}
+
+function showHumanReview(targetId=null){
+ document.getElementById('verification-view').classList.add('hidden');
+ document.getElementById('request-view').classList.add('hidden');
+ document.getElementById('inbox-view').classList.add('hidden');
+ document.getElementById('human-review-view').classList.remove('hidden');
+ document.getElementById('page-title').innerText='Human Review';
+ setSidebarCategoryActive(false);
+ document.getElementById('review-editor').classList.add('hidden');
+ document.getElementById('review-queue').classList.remove('hidden');
+ renderHumanReviewQueue();
+ if(targetId) openHumanReview(targetId);
+}
+
+function humanReviewNeeded(r){
+ return r.result!=='match' && !requestIsCompleted(r);
+}
+
+function renderHumanReviewQueue(){
+ const queue=requests.filter(humanReviewNeeded);
+ document.getElementById('review-queue-count').innerText=`${queue.length} request${queue.length===1?'':'s'}`;
+ document.getElementById('review-queue').innerHTML=queue.map(r=>`
+   <div class="request-row px-5 py-4 border-b border-gold/15 flex items-center justify-between gap-4">
+     <div class="flex items-center gap-4 min-w-0">
+       <div class="w-10 h-10 rounded-xl bg-navy text-gold font-extrabold flex items-center justify-center shrink-0 border gold-border shadow-sm">${r.avatar}</div>
+       <div class="min-w-0">
+         <div class="flex items-center gap-2">
+           <p class="font-extrabold text-sm text-navy">${r.id}</p>
+           ${r.reviewed ? '<span title="Human Review updated" class="w-5 h-5 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[9px] border border-amber-300"><i class="fa-solid fa-pen"></i></span>' : ''}
+         </div>
+         <p class="text-xs text-navy/60 mt-1 truncate">${r.subject}</p>
+       </div>
+     </div>
+     <div class="flex items-center gap-2 shrink-0">
+       <span class="status result-status ${r.result}"><i class="fa-solid ${statusInfo[r.result].icon}"></i>${statusInfo[r.result].label}</span>
+       <span class="status progress-status incompleted"><i class="fa-solid fa-clock"></i>Incompleted</span>
+       <button onclick="openHumanReview('${r.id}')" class="ml-1 px-3 py-2 rounded-xl bg-navy text-gold border gold-border text-[10px] font-extrabold hover:bg-navy-light">Review</button>
+     </div>
+   </div>`).join('') || `<div class="p-10 text-center text-xs text-navy/50">No requests currently require Human Review.</div>`;
+}
+
+const reviewFieldNames=['Shipper','Consignee','Notify Party','Port of Loading','Port of Discharge','Container Count','Gross Weight'];
+let activeReviewRequest=null;
+let uploadedReviewFile=null;
+
+function openHumanReview(id){
+ activeReviewRequest=requests.find(r=>r.id===id);
+ if(!activeReviewRequest)return;
+ uploadedReviewFile=null;
+ document.getElementById('review-file').value='';
+ document.getElementById('uploaded-file-name').classList.add('hidden');
+ const btn=document.getElementById('apply-file-btn');
+ btn.disabled=true; btn.classList.add('bg-gold/30','text-navy/40','border-gold/20','cursor-not-allowed'); btn.classList.remove('gold-gradient','text-navy-dark');
+ document.getElementById('review-queue').classList.add('hidden');
+ document.getElementById('review-editor').classList.remove('hidden');
+ document.getElementById('review-breadcrumb-id').innerText=activeReviewRequest.id;
+ document.getElementById('review-editor-title').innerText=`Review ${activeReviewRequest.id}`;
+ document.getElementById('review-editor-subtitle').innerText=activeReviewRequest.subject;
+ document.getElementById('review-editor-status').innerHTML=`<span class="status result-status ${activeReviewRequest.result}"><i class="fa-solid ${statusInfo[activeReviewRequest.result].icon}"></i>${statusInfo[activeReviewRequest.result].label}</span><span class="status progress-status incompleted ml-2"><i class="fa-solid fa-clock"></i>Incompleted</span>`;
+ document.getElementById('review-fields').innerHTML=reviewFieldNames.map((name,i)=>`
+   <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 items-center rounded-xl border gold-border bg-ivory-light p-3">
+     <div><p class="text-[10px] uppercase tracking-wider font-extrabold text-navy/50">${name}</p><p class="text-[10px] text-navy/40 mt-1">SI reference: ${activeReviewRequest.siFields[i]}</p></div>
+     <input id="review-field-${i}" value="${activeReviewRequest.blFields[i]}" class="w-full px-3 py-2.5 rounded-lg border gold-border bg-white text-xs font-semibold text-navy outline-none focus:border-gold">
+   </div>`).join('');
+}
+
+function handleReviewFile(input){
+ uploadedReviewFile=input.files && input.files[0] ? input.files[0] : null;
+ const box=document.getElementById('uploaded-file-name');
+ const btn=document.getElementById('apply-file-btn');
+ if(uploadedReviewFile){
+   box.classList.remove('hidden');
+   box.innerHTML=`<i class="fa-solid fa-file text-gold mr-2"></i><b>${uploadedReviewFile.name}</b><span class="text-navy/50 ml-2">ready to apply as replacement document data</span>`;
+   btn.disabled=false; btn.classList.remove('bg-gold/30','text-navy/40','border-gold/20','cursor-not-allowed'); btn.classList.add('gold-gradient','text-navy-dark');
+ }
+}
+
+function applyUploadedData(){
+ if(!activeReviewRequest || !uploadedReviewFile)return;
+ // Prototype behavior: the uploaded replacement document is treated as corrected source data.
+ activeReviewRequest.blFields=[...activeReviewRequest.siFields];
+ activeReviewRequest.bl=uploadedReviewFile.name;
+ activeReviewRequest.reviewed=true;
+ activeReviewRequest.modified=true;
+ activeReviewRequest.reviewerName='Aiman Hakim';
+ activeReviewRequest.reviewerAccount='PRT-ADM-017';
+ activeReviewRequest.reviewerPosition='Port Administrator';
+ activeReviewRequest.result='match';
+ activeReviewRequest.status='completed';
+ activeReviewRequest.remark=`Human Review: Replacement document “${uploadedReviewFile.name}” was uploaded and used to update the extracted Bill of Lading data.`;
+ activeReviewRequest.editedField='Replacement Document';
+ activeReviewRequest.editedValue=uploadedReviewFile.name;
+ refreshAfterReview();
+}
+
+function saveManualReview(){
+ if(!activeReviewRequest)return;
+ const values=reviewFieldNames.map((_,i)=>document.getElementById(`review-field-${i}`).value.trim() || '—');
+ activeReviewRequest.blFields=values;
+ activeReviewRequest.reviewed=true;
+ activeReviewRequest.modified=true;
+ activeReviewRequest.reviewerName='Aiman Hakim';
+ activeReviewRequest.reviewerAccount='PRT-ADM-017';
+ activeReviewRequest.reviewerPosition='Port Administrator';
+ const mismatchIndex=values.findIndex((v,i)=>v!==activeReviewRequest.siFields[i]);
+ if(mismatchIndex===-1){
+   activeReviewRequest.result='match';
+   activeReviewRequest.status='completed';
+   activeReviewRequest.remark='Human Review: Data was manually corrected and re-checked. All compared fields now match the Shipping Instruction.';
+   activeReviewRequest.editedField=reviewFieldNames[0];
+   activeReviewRequest.editedValue=values[0];
+ }else{
+   activeReviewRequest.result='mismatch';
+   activeReviewRequest.status='mismatch';
+   activeReviewRequest.remark='Human Review: Manual edits were saved, but one or more fields still do not match the Shipping Instruction. Further review is required.';
+   activeReviewRequest.editedField=reviewFieldNames[mismatchIndex];
+   activeReviewRequest.editedValue=values[mismatchIndex];
+ }
+ refreshAfterReview();
+}
+
+function refreshAfterReview(){
+ renderRequests();
+ renderHumanReviewQueue();
+ currentRequest=activeReviewRequest;
+ openVerification(activeReviewRequest.id);
+}
+
+function showRequests(){
+ document.getElementById('verification-view').classList.add('hidden');
+ document.getElementById('human-review-view').classList.add('hidden');
+ document.getElementById('inbox-view').classList.add('hidden');
+ document.getElementById('request-view').classList.remove('hidden');
+ document.getElementById('page-title').innerText='Comparison Requests';
+ setSidebarCategoryActive(true);
+ 
+renderRequests();
+}
+
+function toggleSidebar(){
+ const s=document.getElementById('sidebar');
+ s.classList.toggle('w-64');s.classList.toggle('w-20');
+ document.querySelectorAll('.sidebar-text').forEach(e=>e.classList.toggle('hidden'));
+ document.getElementById('brand-text').classList.toggle('hidden');
+}
+
+function goToHumanReview(){
+ if(currentRequest) showHumanReview(currentRequest.id);
+}
+
+showInbox();
+</script>
+</body>
+</html>
