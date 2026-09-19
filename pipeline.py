@@ -199,11 +199,6 @@ def compare_si_bl(si_text, bl_text):
         return {"status": "MISMATCH", "review_reason": None, 
                 "has_defect": True, "defect_fields": defect_fields}
     
-<<<<<<< Updated upstream
-    return {"status": "OK", "review_reason": None, "has_defect": False, "defect_fields": []}
-def run_pipeline(source="resources/sdoc-hackathon-bundle"):
-    print(f"🔍 Initializing Inbox from: {source}")
-=======
     return {"status": "OK", "review_reason": None, 
             "has_defect": False, "defect_fields": []}
 
@@ -222,7 +217,6 @@ def run_pipeline():
     inbox = Inbox("http://localhost:8080")
     
     # ✅ GET THE LIST OF EMAILS THE SERVER ACTUALLY WANTS
->>>>>>> Stashed changes
     try:
         sample = inbox.sample_submission()
         required_ids = set(sample.keys())
