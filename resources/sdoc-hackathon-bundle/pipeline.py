@@ -1,6 +1,8 @@
 import json
 import re
 from loader import Inbox
+import io
+from pathlib import Path
 
 # ─── Field Aliases & Patterns ──────────────────────────────────────
 FIELD_ALIASES = {
@@ -15,6 +17,51 @@ FIELD_ALIASES = {
 
 REQUIRED_FIELDS = list(FIELD_ALIASES.keys())
 
+def extract_text_from_attachment(inbox, att_path):
+    """Reads .txt, .xlsx, .docx, and .pdf files and returns plain text."""
+    try:
+        # 1. Handle Text Files (Original Logic)
+        if att_path.endswith(".txt"):
+            return inbox.read_text(att_path)
+        
+        # Get raw bytes for binary files
+        raw_bytes = inbox.read_bytes(att_path)
+        
+        # 2. Handle Excel Files (.xlsx)
+        if att_path.endswith(".xlsx"):
+            from openpyxl import load_workbook
+            wb = load_workbook(filename=io.BytesIO(raw_bytes))
+            text_parts = []
+            for sheet in wb.worksheets:
+                for row in sheet.iter_rows(values_only=True):
+                    # Filter out None values and join cells
+                    line = " ".join([str(cell) for cell in row if cell is not None])
+                    if line.strip():
+                        text_parts.append(line)
+            return "\n".join(text_parts)
+
+        # 3. Handle Word Files (.docx)
+        elif att_path.endswith(".docx"):
+            from docx import Document
+            doc = Document(io.BytesIO(raw_bytes))
+            return "\n".join([para.text for para in doc.paragraphs])
+
+        # 4. Handle PDF Files (.pdf)
+        elif att_path.endswith(".pdf"):
+            import pdfplumber
+            with pdfplumber.open(io.BytesIO(raw_bytes)) as pdf:
+                text_parts = []
+                for page in pdf.pages:
+                    text_parts.append(page.extract_text())
+                return "\n".join(text_parts)
+                
+        else:
+            return "" # Unsupported format
+            
+    except Exception as e:
+        print(f"⚠️ Error reading {att_path}: {e}")
+        return ""
+    
 def normalize_value(field, value):
     """Clean up extracted values for better comparison."""
     if not value: return ""
@@ -103,6 +150,7 @@ def compare_si_bl(si_text, bl_text):
         return {"status": "MISMATCH", "review_reason": None, "has_defect": True, "defect_fields": defect_fields}
     
     return {"status": "OK", "review_reason": None, "has_defect": False, "defect_fields": []}
+
 def run_pipeline(source="resources/sdoc-hackathon-bundle"):
     print(f"🔍 Initializing Inbox from: {source}")
     try:
@@ -134,20 +182,19 @@ def run_pipeline(source="resources/sdoc-hackathon-bundle"):
             bl_text = ""
             
             for att in email.get("attachments", []):
-                try:
-                    if "si" in att.lower():
-                        si_text = inbox.read_text(att)
-                    if "bl" in att.lower():
-                        bl_text = inbox.read_text(att)
-                except Exception as e:
-                    print(f"   ⚠️ Could not read attachment {att}: {e}")
+                content = extract_text_from_attachment(inbox, att)
+                
+                if "si" in att.lower():
+                    si_text = content
+                if "bl" in att.lower():
+                    bl_text = content
 
-            # Fallback to body if SI attachment is missing/unreadable
+            # Fallback: Check email body for SI if no attachment found or failed
             if not si_text and "shipper" in email.get("body", "").lower():
                 si_text = email["body"]
 
             if not si_text or not bl_text:
-                entry.update({"status": "NEEDS_REVIEW", "review_reason": "missing_attachment"})
+                entry.update({"status": "NEEDS_REVIEW", "review_reason": "unreadable"})
             else:
                 cmp = compare_si_bl(si_text, bl_text)
                 entry.update(cmp)
