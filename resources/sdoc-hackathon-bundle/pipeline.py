@@ -150,7 +150,6 @@ def compare_si_bl(si_text, bl_text):
         return {"status": "MISMATCH", "review_reason": None, "has_defect": True, "defect_fields": defect_fields}
     
     return {"status": "OK", "review_reason": None, "has_defect": False, "defect_fields": []}
-
 def run_pipeline(source="resources/sdoc-hackathon-bundle"):
     print(f"🔍 Initializing Inbox from: {source}")
     try:
