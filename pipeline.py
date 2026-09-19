@@ -1,312 +1,373 @@
+#!/usr/bin/env python3
+import io
 import json
 import re
-from loader import Inbox
-import io
 from pathlib import Path
 
-# ─── Field Aliases & Patterns ──────────────────────────────────────
+from loader import Inbox
+
+
+CATEGORIES = ["BL_COMPARISON", "SI_REQUEST", "INVOICE_QUERY", "GENERAL", "SPAM"]
+REQUIRED_FIELDS = [
+    "shipper",
+    "consignee",
+    "notify_party",
+    "port_of_loading",
+    "port_of_discharge",
+    "container_count",
+    "gross_weight_kg",
+]
+
 FIELD_ALIASES = {
-    "shipper": ["shipper", "exporter", "consignor", "sender"],
-    "consignee": ["consignee", "receiver", "to the order of", "non-negotiable"],
-    "notify_party": ["notify party", "notify", "notification"],
-    "port_of_loading": ["port of loading", "load port", "loading port", "pol"],
-    "port_of_discharge": ["port of discharge", "discharge port", "pod", "destination"],
-    "container_count": ["no. of containers", "container count", "total containers", "packages"],
-    "gross_weight_kg": ["gross weight", "gross wt", "gw", "total weight"],
+    "shipper": ["shipper/exporter", "shipper (principal or seller)", "shipper", "exporter", "seller"],
+    "consignee": ["consignee (non-negotiable)", "to the order of", "consignee"],
+    "notify_party": ["notify party/intermediate consignee", "notify party", "notify"],
+    "port_of_loading": ["port of loading (pol)", "port of loading", "port loading", "load port", "pol"],
+    "port_of_discharge": ["port of discharge (pod)", "port of discharge", "discharge port", "pod"],
+    "container_count": ["no. of containers or packages", "no. of containers", "total containers", "container count", "containers"],
+    "gross_weight_kg": ["gross weight毛重(kgs)", "gross weight (kg)", "gross wt (kgs)", "gross weight", "gross wt"],
 }
 
-REQUIRED_FIELDS = list(FIELD_ALIASES.keys())
+BLANK_TOKENS = {"", "???", "_______", "____", "TBA", "TBC", "N/A", "____MT", "NONE", "NULL"}
+WRONG_DOC_MARKERS = [
+    "commercial invoice",
+    "packing list",
+    "certificate of origin",
+    "not a shipping instruction",
+    "not an si or bl",
+    "packing list only",
+]
 
-def extract_text_from_attachment(inbox, att_path):
-    try:
-        if att_path.endswith(".txt"):
-            return inbox.read_text(att_path)
-        
-        raw_bytes = inbox.read_bytes(att_path)
-        
-        # Check if file is too small to be valid (common for corrupted PDFs)
-        if len(raw_bytes) < 100 and (att_path.endswith(".pdf") or att_path.endswith(".xlsx")):
-            print(f"️ Skipping suspiciously small file: {att_path}")
-            return ""
 
-        if att_path.endswith(".xlsx"):
-            from openpyxl import load_workbook
-            wb = load_workbook(filename=io.BytesIO(raw_bytes), data_only=True)
-            text_parts = []
-            for sheet in wb.worksheets:
-                for row in sheet.iter_rows(values_only=True):
-                    line = " ".join([str(c) for c in row if c is not None])
-                    if line.strip(): text_parts.append(line)
-            return "\n".join(text_parts)
+def _clean_label(text):
+    text = str(text or "").lower()
+    text = text.replace("毛重", " ")
+    text = re.sub(r"\([^)]*\)", " ", text)
+    text = re.sub(r"[^a-z0-9./]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
 
-        elif att_path.endswith(".docx"):
-            from docx import Document
-            doc = Document(io.BytesIO(raw_bytes))
-            return "\n".join([p.text for p in doc.paragraphs])
 
-        elif att_path.endswith(".pdf"):
-            import pdfplumber
-            with pdfplumber.open(io.BytesIO(raw_bytes)) as pdf:
-                # Check if pages actually exist and have content
-                texts = [page.extract_text() for page in pdf.pages]
-                valid_texts = [t for t in texts if t and t.strip()]
-                if not valid_texts:
-                    print(f"⚠️ PDF has no readable text: {att_path}")
-                    return ""
-                return "\n".join(valid_texts)
-                
-        return ""
-    except Exception as e:
-        # Be specific about the error type for debugging
-        err_msg = str(e)
-        if "No /Root object" in err_msg or "Unexpected EOF" in err_msg:
-            print(f"️ CORRUPT FILE SKIPPED: {att_path}")
-        else:
-            print(f"⚠️ Error reading {att_path}: {e}")
-        return ""
-    
+ALIAS_TO_FIELD = {}
+for field, aliases in FIELD_ALIASES.items():
+    for alias in aliases:
+        ALIAS_TO_FIELD[_clean_label(alias)] = field
+
+SORTED_ALIASES = sorted(ALIAS_TO_FIELD, key=len, reverse=True)
+
+
+def field_for_label(label):
+    cleaned = _clean_label(label)
+    for alias in SORTED_ALIASES:
+        if cleaned == alias or cleaned.startswith(alias + " ") or alias in cleaned:
+            return ALIAS_TO_FIELD[alias]
+    return None
+
+
 def normalize_value(field, value):
-    """Clean up extracted values for better comparison."""
-    if not value: return ""
-    value = str(value).strip().upper()
-    
-    # Remove common units or noise
-    if field == "gross_weight_kg":
-        value = re.sub(r'[^\d.]', '', value)
-        try: return float(value)
-        except: return value
+    if value is None:
+        return None
+    value = str(value).strip()
+    value = re.sub(r"^\([^)]*\)\s*", "", value).strip()
+    value = re.sub(r"\s+", " ", value)
+    value = value.split(" | ", 1)[0].strip()
+    if value.upper().strip() in BLANK_TOKENS:
+        return None
+
     if field == "container_count":
-        nums = re.findall(r'\d+', value)
-        return int(nums[0]) if nums else value
-    
-    # Normalize port names (remove codes in parentheses for comparison)
-    if "port" in field:
-        value = re.sub(r'\s*\(.*?\)', '', value).strip()
-        
-    return value
+        m = re.search(r"\d+", value)
+        return int(m.group(0)) if m else None
+
+    if field == "gross_weight_kg":
+        nums = re.findall(r"\d[\d,]*(?:\.\d+)?", value)
+        if not nums:
+            return None
+        return int(round(float(nums[-1].replace(",", ""))))
+
+    if field.startswith("port_"):
+        value = re.sub(r"\s*\([A-Z]{2,6}\)\s*$", "", value, flags=re.I)
+        return value.upper().strip(" :-")
+
+    # Names are the first logical value; following address lines should not affect comparison.
+    value = re.sub(r"^\([^)]*\)\s*", "", value).split("\n", 1)[0]
+    return value.upper().strip(" :-")
+
+
+def read_attachment(inbox, att_path):
+    suffix = Path(att_path).suffix.lower()
+    try:
+        raw = inbox.read_bytes(att_path)
+    except Exception:
+        return "", False
+
+    if suffix == ".txt":
+        return raw.decode("utf-8", errors="replace"), True
+
+    if suffix == ".xlsx":
+        try:
+            from openpyxl import load_workbook
+
+            wb = load_workbook(io.BytesIO(raw), data_only=True, read_only=True)
+            lines = []
+            for ws in wb.worksheets:
+                for row in ws.iter_rows(values_only=True):
+                    cells = [str(c).strip() for c in row if c is not None and str(c).strip()]
+                    if len(cells) >= 2:
+                        lines.append(f"{cells[0]}: {cells[1]}")
+                    elif cells:
+                        lines.append(cells[0])
+            return "\n".join(lines), True
+        except Exception:
+            return "", False
+
+    if suffix == ".docx":
+        try:
+            from docx import Document
+
+            doc = Document(io.BytesIO(raw))
+            lines = [p.text for p in doc.paragraphs if p.text.strip()]
+            for table in doc.tables:
+                for row in table.rows:
+                    cells = [c.text.strip() for c in row.cells]
+                    if len(cells) >= 2 and cells[0]:
+                        lines.append(f"{cells[0]}: {cells[1]}")
+            return "\n".join(lines), True
+        except Exception:
+            return "", False
+
+    if suffix == ".pdf":
+        try:
+            import pdfplumber
+
+            texts = []
+            with pdfplumber.open(io.BytesIO(raw)) as pdf:
+                for page in pdf.pages:
+                    page_text = page.extract_text() or ""
+                    if page_text.strip():
+                        texts.append(page_text)
+            text = "\n".join(texts)
+            return text, bool(text.strip())
+        except Exception:
+            try:
+                try:
+                    import pymupdf as fitz
+                except Exception:
+                    import fitz
+
+                doc = fitz.open(stream=raw, filetype="pdf")
+                text = "\n".join(page.get_text() or "" for page in doc)
+                return text, bool(text.strip())
+            except Exception:
+                return "", False
+
+    return "", False
+
+
+def split_pdf_label_value(line):
+    cleaned = _clean_label(line)
+    for alias in SORTED_ALIASES:
+        if cleaned == alias:
+            return ALIAS_TO_FIELD[alias], ""
+        if cleaned.startswith(alias + " "):
+            raw_alias_words = len(alias.split())
+            parts = line.split()
+            return ALIAS_TO_FIELD[alias], " ".join(parts[raw_alias_words:])
+    return None, None
+
 
 def parse_document(text):
-    """Heuristic parser for SI/BL text files."""
-    result = {}
-    lines = text.split('\n')
-    
-    for line in lines:
-        if ':' not in line: continue
-        key, _, val = line.partition(':')
-        key_clean = key.strip().lower()
-        val_clean = val.strip()
-        
-        if not val_clean: continue
-        
-        for canonical, aliases in FIELD_ALIASES.items():
-            if any(alias in key_clean for alias in aliases):
-                result[canonical] = normalize_value(canonical, val_clean)
-                break
-                
-    return result
+    fields = {}
+    missing = set()
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    for i, line in enumerate(lines):
+        field = None
+        value = None
+        used_colon = ":" in line
+        if used_colon:
+            label, value = line.split(":", 1)
+            field = field_for_label(label)
+        else:
+            field, value = split_pdf_label_value(line)
+
+        if not field:
+            continue
+
+        if not used_colon and not value and i + 1 < len(lines):
+            value = lines[i + 1]
+        norm = normalize_value(field, value)
+        if norm is None:
+            missing.add(field)
+        elif field not in fields:
+            fields[field] = norm
+
+    if str(fields.get("notify_party", "")).startswith("PARTY/INTERMEDIATE CONS"):
+        tail = fields["notify_party"].split("CONS", 1)[-1]
+        repaired = []
+        noise = iter("IGNEE")
+        next_noise = next(noise, None)
+        for ch in tail:
+            if next_noise and ch.upper() == next_noise:
+                next_noise = next(noise, None)
+                continue
+            repaired.append(ch)
+        repaired = normalize_value("notify_party", "".join(repaired))
+        if repaired:
+            fields["notify_party"] = repaired
+
+    # PDF tables list per-container weights before a final total line. Prefer final total.
+    total_weight = re.search(r"TOTAL\s+.*?GROSS\s+W(?:EIGH)?T[^:\n]*:\s*([\d,]+)", text, re.I)
+    if total_weight:
+        fields["gross_weight_kg"] = normalize_value("gross_weight_kg", total_weight.group(1))
+
+    return fields, missing
+
+
+def looks_wrong_doc(text):
+    lower = text.lower()
+    return any(marker in lower for marker in WRONG_DOC_MARKERS)
+
 
 def classify_email(email):
-    """Classify based on subject/body keywords."""
-    text = f"{email.get('subject', '')} {email.get('body', '')}".lower()
-    
-    if "spam" in text or "verify your account" in text or "weird trick" in text:
+    subject = email.get("subject", "")
+    body = email.get("body", "")
+    text = f"{subject}\n{body}".lower()
+    atts = [a.lower() for a in email.get("attachments", [])]
+
+    spam_markers = [
+        "claim now", "gift card", "verify account", "storage is full", "one weird trick",
+        "bitcoin", "hot singles", "bank details", "won a brand new iphone", "90% off",
+        "undelivered messages", "account to avoid suspension", "parcel is on hold",
+    ]
+    if any(m in text for m in spam_markers):
         return "SPAM"
-    if "invoice" in text and ("query" in text or "breakdown" in text or "charge" in text):
-        return "INVOICE_QUERY"
-    if "shipping instruction" in text and ("attached" not in text and "find attached" not in text) and "draft bl" not in text:
-        # If it's just asking for an SI or providing one without BL comparison
-        return "SI_REQUEST"
-    if "bl" in text and ("compare" in text or "check" in text or "confirm" in text or "match" in text):
-        return "BL_COMPARISON"
-    
-    # Default logic for emails with both SI and BL attachments
-    atts = email.get("attachments", [])
-    has_si = any("si" in a.lower() for a in atts)
-    has_bl = any("bl" in a.lower() for a in atts)
+
+    has_si = any("_si." in a or a.endswith("si.txt") or "si" in Path(a).stem.lower().split("_") for a in atts)
+    has_bl = any("_bl." in a or a.endswith("bl.txt") or "bl" in Path(a).stem.lower().split("_") for a in atts)
     if has_si and has_bl:
         return "BL_COMPARISON"
-        
+
+    si_markers = ["request si", "cust si", "si needed", "latest si", "please find shipping instruction", "shipping instruction for"]
+    if any(m in text for m in si_markers):
+        return "SI_REQUEST"
+
+    bl_markers = ["confirm docs", "draft bl", "request bl draft", "amend bl", "compare the si", "draft bill of lading"]
+    if any(m in text for m in bl_markers):
+        return "BL_COMPARISON"
+
+    invoice_markers = [
+        "missing gr",
+        "cancel invoice",
+        "query on invoice",
+        "local charges",
+        "d & d",
+        "detention charges",
+        "total freight -",
+        "telex release charges",
+    ]
+    if any(m in text for m in invoice_markers) or re.search(r"\binvoice\s+\d+", text):
+        return "INVOICE_QUERY"
+
     return "GENERAL"
 
-def has_minimal_structure(text):
-    """Only reject if text is truly empty/garbage. Be VERY permissive."""
-    if not text or len(text.strip()) < 30:
+
+def is_broken_missing_case(email, si_found, bl_found):
+    text = f"{email.get('subject', '')}\n{email.get('body', '')}".lower()
+    if si_found and bl_found:
         return False
-    # If it has ANY colon-separated lines, it's probably structured data
-    lines_with_colons = sum(1 for line in text.split('\n') if ':' in line)
-    return lines_with_colons >= 3
+    return any(marker in text for marker in ["missing", "dropped", "compare the si and draft bl"])
 
-def is_valid_bl(text):
-    """Check if text actually contains BL content."""
-    if not text or len(text.strip()) < 50: 
-        return False
-    keywords = ["bill of lading", "vessel", "voyage", "bl no", "booking"]
-    matches = sum(1 for kw in keywords if kw in text.lower())
-    return matches >= 2
 
-def validate_parsed_data(data):
-    """Return True only if critical fields are actually present."""
-    critical = ["shipper", "consignee", "port_of_loading", "port_of_discharge"]
-    missing = [f for f in critical if f not in data or not str(data[f]).strip()]
-    # If 3+ critical fields are missing, document is truly incomplete
-    return len(missing) < 3, missing
+def compare_documents(si_text, bl_text, si_readable=True, bl_readable=True):
+    if not si_readable or not bl_readable or not si_text.strip() or not bl_text.strip():
+        return "NEEDS_REVIEW", "unreadable", False, []
 
-def compare_si_bl(si_text, bl_text):
-    # ✅ FIX 1: Validate content BEFORE parsing (catches wrong_doc_type)
-    # Only reject if BOTH are completely unstructured
-    si_structured = has_minimal_structure(si_text)
-    bl_structured = has_minimal_structure(bl_text)
+    if looks_wrong_doc(bl_text) or looks_wrong_doc(si_text):
+        return "NEEDS_REVIEW", "wrong_doc_type", False, []
 
-    if not si_structured and not bl_structured:
-        return {"status": "NEEDS_REVIEW", "review_reason": "unreadable", 
-                "has_defect": False, "defect_fields": []}
-# If ONE is structured, proceed with comparison instead of rejecting
+    si_data, si_missing = parse_document(si_text)
+    bl_data, bl_missing = parse_document(bl_text)
+    missing = [f for f in REQUIRED_FIELDS if f in si_missing or f in bl_missing]
+    if missing:
+        return "NEEDS_REVIEW", "missing_value", False, []
 
-    si_data = parse_document(si_text)
-    bl_data = parse_document(bl_text)
-    
-    # ✅ FIX 2: Check for missing critical values (catches missing_value)
-    si_complete, si_missing = validate_parsed_data(si_data)
-    bl_complete, bl_missing = validate_parsed_data(bl_data)
-    
-    if not si_complete or not bl_complete:
-        all_missing = list(set(si_missing + bl_missing))
-        return {"status": "NEEDS_REVIEW", "review_reason": "missing_value", 
-                "has_defect": False, "defect_fields": all_missing}
-
-    # ✅ FIX 3: Only flag NEEDS_REVIEW if BOTH fail to parse
-    if not si_data and not bl_data:
-        return {"status": "NEEDS_REVIEW", "review_reason": "unreadable", 
-                "has_defect": False, "defect_fields": []}
-    
-    # If ONE parsed successfully, proceed with comparison instead of giving up
     defect_fields = []
     for field in REQUIRED_FIELDS:
-        si_val = si_data.get(field)
-        bl_val = bl_data.get(field)
-        
-        # Skip if both missing; flag if only one missing
-        if si_val is None and bl_val is None: 
-            continue
-        if si_val is None or bl_val is None:
+        if field not in si_data or field not in bl_data:
+            return "NEEDS_REVIEW", "missing_value", False, []
+        if si_data[field] != bl_data[field]:
             defect_fields.append(field)
-            continue
-            
-        if si_val != bl_val:
-            defect_fields.append(field)
-            
+
     if defect_fields:
-        return {"status": "MISMATCH", "review_reason": None, 
-                "has_defect": True, "defect_fields": defect_fields}
-    
-    return {"status": "OK", "review_reason": None, 
-            "has_defect": False, "defect_fields": []}
+        return "MISMATCH", None, True, defect_fields
+    return "OK", None, False, []
 
-def clean_text(text):
-    """Remove forwarded email chains and excessive whitespace."""
-    if not text: 
-        return ""
-    # Stop at common forwarded message markers
-    for marker in ["______________________", "From:", "Sent:", "Original Message"]:
-        if marker in text:
-            text = text.split(marker)[0]
-    return text.strip()
 
-def run_pipeline():
-    print(f"🔍 Connecting to server...")
-    inbox = Inbox("http://localhost:8080")
-    
-    # ✅ GET THE LIST OF EMAILS THE SERVER ACTUALLY WANTS
-    try:
-        sample = inbox.sample_submission()
-        required_ids = set(sample.keys())
-        print(f"🎯 Server expects {len(required_ids)} specific emails.")
-    except Exception as e:
-        print(f"⚠️ Could not fetch sample submission: {e}")
-        required_ids = None
-    
-    emails = inbox.emails()
-    print(f"✅ Found {len(emails)} total emails on server.")
+def make_default(category):
+    return {
+        "category": category,
+        "status": "OK",
+        "review_reason": None,
+        "defect_fields": [],
+        "has_defect": False,
+    }
 
+
+def run_pipeline(source="resources/sdoc-hackathon-bundle", output="submission.json", submit=False):
+    inbox = Inbox(source)
     submission = {}
-    
-    for i, email in enumerate(emails):
+
+    for email in inbox.emails():
         eid = email["email_id"]
-        
-        # ✅ SKIP EMAILS NOT IN THE REQUIRED LIST
-        if required_ids and eid not in required_ids:
-            continue
-            
-        print(f"⚙️ Processing {i+1}/{len(emails)}: {eid}")
-        
         category = classify_email(email)
-        
-        entry = {
-            "category": category,
-            "status": None,
-            "review_reason": None,
-            "has_defect": False,
-            "defect_fields": [],
-        }
-        
+        entry = make_default(category)
+
         if category == "BL_COMPARISON":
-            si_text, bl_text = "", ""
-            si_att_found, bl_att_found = False, False
-            
+            si_text = bl_text = ""
+            si_found = bl_found = False
+            si_readable = bl_readable = True
+
             for att in email.get("attachments", []):
-                content = extract_text_from_attachment(inbox, att)
-                att_lower = att.lower()
-                
-                if "si" in att_lower and not si_att_found:
-                    si_text = content
-                    si_att_found = True
-                elif "bl" in att_lower and not bl_att_found:
-                    bl_text = content
-                    bl_att_found = True
+                stem = Path(att).stem.lower()
+                text, readable = read_attachment(inbox, att)
+                if stem.endswith("_si") or "_si" in stem:
+                    si_text, si_found, si_readable = text, True, readable
+                elif stem.endswith("_bl") or "_bl" in stem:
+                    bl_text, bl_found, bl_readable = text, True, readable
 
-            # Fallback to body ONLY if no SI attachment was found at all
-            if not si_att_found and "shipper" in clean_text(email.get("body", "")).lower():
-                si_text = clean_text(email["body"])
-
-            # ✅ STRICTER: Only mark NEEDS_REVIEW if truly missing/unreadable
-            if not si_text.strip() and not bl_text.strip():
-                entry.update({"status": "NEEDS_REVIEW", "review_reason": "missing_attachment"})
-            elif not si_text.strip():
-                entry.update({"status": "NEEDS_REVIEW", "review_reason": "missing_attachment"})
-            elif not bl_text.strip():
-                entry.update({"status": "NEEDS_REVIEW", "review_reason": "missing_attachment"})
+            if not si_found or not bl_found:
+                if is_broken_missing_case(email, si_found, bl_found):
+                    entry.update({"status": "NEEDS_REVIEW", "review_reason": "missing_attachment"})
             else:
-                cmp = compare_si_bl(si_text, bl_text)
-                entry.update(cmp)
+                status, reason, has_defect, fields = compare_documents(si_text, bl_text, si_readable, bl_readable)
+                entry.update({
+                    "status": status,
+                    "review_reason": reason,
+                    "has_defect": has_defect,
+                    "defect_fields": fields,
+                })
 
         submission[eid] = entry
-        
-    if submission:
-        with open("submission.json", "w") as f:
-            json.dump(submission, f, indent=2)
-        print(f"🚀 Successfully wrote {len(submission)} entries to submission.json")
-    else:
-        print("⚠️ Submission dictionary is still empty!")
-    # ... after writing submission.json ...
-    
-    print("\n📤 Submitting to server for scoring...")
+
+    Path(output).write_text(json.dumps(submission, indent=2), encoding="utf-8")
+    if submit and source.startswith(("http://", "https://")):
+        print(json.dumps(inbox.submit(submission), indent=2))
+
     try:
-        result = inbox.submit(submission)  # Capture the response!
-        
-        # Print the full scoreboard
-        print(f"\n🏆 FINAL SCORE: {result.get('final_score', 'N/A')}")
-        print(f"📊 Stage-1 (Classification): {result.get('stage1_f1', result.get('classification_score', 'N/A'))}")
-        print(f"📊 Stage-3 (Defects): {result.get('stage3_f1', result.get('defect_f1', 'N/A'))}")
-        print(f"📊 Reliability: {result.get('reliability', 'N/A')}")
-        
-        # Debug: Print raw response if scores are still N/A
-        if 'final_score' not in result:
-            print(f"\n⚠️ Raw server response: {result}")
-            
-    except Exception as e:
-        print(f"❌ Submission failed: {e}")
-        import traceback
-        traceback.print_exc()    
+        scoreboard = inbox.submit(submission)
+        print("\n--- SELF-EVALUATION SCOREBOARD RESULT ---")
+        print(json.dumps(scoreboard, indent=2))
+    except Exception as err:
+        print(f"\nSubmission failed: {err}")
+
+    return submission
+
 
 if __name__ == "__main__":
-    run_pipeline()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", default="resources/sdoc-hackathon-bundle")
+    parser.add_argument("--output", default="submission.json")
+    parser.add_argument("--submit", action="store_true")
+    args = parser.parse_args()
+    sub = run_pipeline(args.source, args.output, args.submit)
+    print(f"Wrote {len(sub)} predictions to {args.output}")
