@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarryPort | Operations Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            DEFAULT: '#182536',
+                            dark: '#0f1824',
+                            light: '#23344a',
+                            surface: '#1c2d42'
+                        },
+                        gold: {
+                            DEFAULT: '#C6A15B',
+                            light: '#d9b675',
+                            dark: '#a8833e',
+                            muted: '#e6cf9c'
+                        },
+                        ivory: {
+                            DEFAULT: '#F2E9DA',
+                            light: '#faf6ee',
+                            card: '#f9f4ec',
+                            dark: '#e3d6be'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --color-navy: #182536;
+            --color-gold: #C6A15B;
+            --color-ivory: #F2E9DA;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F2E9DA;
+            color: #182536;
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #d9b675 0%, #C6A15B 50%, #9e7a35 100%);
+        }
+
+        .gold-border {
+            border-color: rgba(198, 161, 91, 0.35);
+        }
+
+        .gold-border-solid {
+            border-color: #C6A15B;
+        }
+
+        .gold-text {
+            color: #C6A15B;
+        }
+
+        .gold-active-nav {
+            background: linear-gradient(90deg, rgba(198, 161, 91, 0.15) 0%, rgba(198, 161, 91, 0.02) 100%);
+            border-left: 4px solid #C6A15B;
+            color: #C6A15B;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(242, 233, 218, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(198, 161, 91, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(198, 161, 91, 0.7);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex overflow-hidden bg-ivory">
+
+    <aside id="sidebar" class="w-64 bg-navy text-ivory flex flex-col justify-between h-full border-r gold-border shrink-0 relative z-20 shadow-xl transition-all duration-300">
+        <div>
+            <!-- Logo Section -->
+            <div class="h-16 flex items-center px-4 border-b gold-border justify-between bg-navy-dark/40">
+                <div class="flex items-center space-x-3 overflow-hidden">
+                    <img src="resources/image/logo.png" alt="HarryPort Logo" 
+                         onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2942/2942544.png';" 
+                         class="h-9 w-9 object-contain shrink-0 filter drop-shadow-md">
+                    <span id="brand-text" class="font-extrabold text-lg text-ivory tracking-wide whitespace-nowrap">
+                        Harry<span class="gold-text">Port</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-3 space-y-1.5">
+                <button onclick="selectCategoryFromSidebar('All')" id="nav-inbox" class="w-full flex items-center p-2.5 gold-active-nav font-bold rounded-r-xl transition">
+                    <i class="fa-solid fa-inbox w-6 text-center gold-text"></i>
+                    <span class="sidebar-text ml-3 text-sm whitespace-nowrap">Inbox</span>
+                </button>
+                <button onclick="switchReviewSubPage('dashboard')" id="nav-review" class="w-full flex items-center p-2.5 text-ivory/80 hover:text-ivory hover:bg-navy-light/50 font-semibold rounded-xl transition">
+                    <i class="fa-solid fa-triangle-exclamation w-6 text-center gold-text"></i>
+                    <span class="sidebar-text ml-3 text-sm whitespace-nowrap">Human Review</span>
+                    <span id="review-badge" class="sidebar-text ml-auto gold-gradient text-navy-dark text-xs font-black py-0.5 px-2 rounded-full shadow-sm">5</span>
+                </button>
+            </nav>
+
+            <!-- Categories Section -->
+            <div class="px-3 py-2 mt-2">
+                <div class="flex items-center justify-between px-2 mb-2">
+                    <p class="sidebar-text text-[11px] font-extrabold gold-text uppercase tracking-widest">Categories</p>
+                    <span class="sidebar-text text-[10px] text-ivory/50 font-mono">LIVE COUNT</span>
+                </div>
+                <ul class="space-y-1">
+                    <li onclick="selectCategoryFromSidebar('Comparison requests')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-gold shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Comparison requests</span>
+                        </div>
+                        <span id="sidebar-count-comparison" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                    <li onclick="selectCategoryFromSidebar('New SI requests')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">New SI requests</span>
+                        </div>
+                        <span id="sidebar-count-si" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                    <li onclick="selectCategoryFromSidebar('Invoice queries')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Invoice queries</span>
+                        </div>
+                        <span id="sidebar-count-invoice" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                    <li onclick="selectCategoryFromSidebar('General mail')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">General mail</span>
+                        </div>
+                        <span id="sidebar-count-general" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                    <li onclick="switchView('spam')" id="nav-spam" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-rose-950/40 hover:text-rose-400 rounded-lg cursor-pointer transition group mt-2 border border-transparent hover:border-rose-900/50">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Spam Folder</span>
+                        </div>
+                        <span id="sidebar-count-spam" class="sidebar-text text-xs font-bold bg-rose-950/50 border border-rose-900/50 text-rose-400 px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer / Settings -->
+        <div class="p-3 border-t gold-border space-y-1 bg-navy-dark/30">
+            <button onclick="openModal('settings-modal')" class="w-full flex items-center p-2 text-ivory/80 hover:text-gold hover:bg-navy-light/50 rounded-lg transition">
+                <i class="fa-solid fa-gear w-6 text-center gold-text"></i>
+                <span class="sidebar-text ml-3 text-sm font-semibold whitespace-nowrap">Settings</span>
+            </button>
+            <button onclick="openModal('logout-modal')" class="w-full flex items-center p-2 text-rose-300 hover:text-rose-200 hover:bg-rose-950/40 rounded-lg transition">
+                <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center"></i>
+                <span class="sidebar-text ml-3 text-sm font-semibold whitespace-nowrap">Log Out</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-ivory">
+        
+        <!-- Header -->
+        <header class="h-16 bg-navy text-ivory flex items-center justify-between px-6 border-b gold-border shrink-0 z-10 shadow-md">
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleSidebar()" class="text-ivory/80 hover:text-gold p-2 rounded-lg hover:bg-navy-light/50 transition">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <h1 id="page-title" class="font-extrabold text-lg text-ivory tracking-wide">Inbox</h1>
+                    <span class="hidden md:inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full border gold-border text-gold bg-navy-light">
+                        HarryPort Operations
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <button onclick="openModal('notification-modal')" class="p-2 text-ivory/80 hover:text-gold hover:bg-navy-light/50 rounded-lg transition relative">
+                    <i class="fa-solid fa-bell text-lg"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 gold-gradient rounded-full border border-navy shadow-sm"></span>
+                </button>
+
+                <div class="h-6 w-px bg-gold/20"></div>
+
+                <div class="flex items-center space-x-3 cursor-pointer p-1.5 rounded-xl hover:bg-navy-light/50 transition border border-transparent hover:border-gold/30">
+                    <div class="w-9 h-9 rounded-xl gold-gradient text-navy-dark flex items-center justify-center font-black text-sm shadow-md border border-ivory/20">
+                        C
+                    </div>
+                    <div class="hidden sm:block text-left">
+                        <p class="text-xs font-bold text-ivory leading-none">Captain</p>
+                        <p class="text-[10px] text-gold font-medium mt-0.5">Port Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-ivory">
+
+            <!-- ===================== 1. INBOX VIEW ===================== -->
+            <div id="view-inbox" class="space-y-4 max-w-7xl mx-auto">
+                <!-- Search & Filters Bar -->
+                <div class="flex flex-wrap gap-3 items-center justify-between bg-white p-3.5 rounded-2xl border gold-border shadow-sm">
+                    <div class="relative flex-1 min-w-[240px]">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gold text-sm"></i>
+                        <input type="text" id="email-search" oninput="applyFilters()" placeholder="Search sender, subject, preview..." 
+                               class="w-full pl-10 pr-4 py-2 bg-ivory-light border gold-border rounded-xl text-sm text-navy font-medium focus:outline-none focus:ring-2 focus:ring-gold/50 transition">
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs font-extrabold gold-text uppercase tracking-wider whitespace-nowrap">
+                            <i class="fa-solid fa-filter mr-1"></i> Category Filter:
+                        </label>
+                        <select id="category-filter" onchange="applyFilters()" 
+                                class="bg-navy text-ivory border gold-border text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-gold/50 cursor-pointer shadow-sm">
+                            <option value="All" id="opt-all">All Categories (0)</option>
+                            <option value="Comparison requests" id="opt-comparison">Comparison requests (0)</option>
+                            <option value="New SI requests" id="opt-si">New SI requests (0)</option>
+                            <option value="Invoice queries" id="opt-invoice">Invoice queries (0)</option>
+                            <option value="General mail" id="opt-general">General mail (0)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                    <div class="bg-navy-surface px-4 py-3 border-b gold-border flex items-center justify-between">
+                        <span class="text-xs font-bold text-gold uppercase tracking-wider">Email Messages</span>
+                        <span id="showing-count" class="text-xs text-ivory/70 font-mono">Showing all emails</span>
+                    </div>
+
+                    <div id="email-list" class="divide-y divide-gold/15">
+                        
+                        <!-- Row 1: Comparison -->
+                        <div class="email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group" data-category="Comparison requests">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-navy text-gold font-extrabold flex items-center justify-center shrink-0 border gold-border group-hover:scale-105 transition-transform shadow-sm">M</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate">Maersk Freight Services</h4>
+                                    <!-- Double Badge -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-navy text-gold border gold-border text-[9px] font-extrabold rounded uppercase tracking-wide">Category: Comparison</span>
+                                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Classified</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Q3 Rate Comparison Matrix for Asia-Pacific Routes</p>
+                                    <p class="text-xs text-navy/60 truncate">Please review the valid freight quotes attached for processing.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                    <option value="Spam">Spam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: New SI -->
+                        <div class="email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group" data-category="New SI requests">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 font-extrabold flex items-center justify-center shrink-0 border border-amber-300 group-hover:scale-105 transition-transform shadow-sm">C</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate">COSCO Shipping</h4>
+                                    <!-- Double Badge -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Category: New SI</span>
+                                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Classified</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Shipping Instructions - Vessel 908 Voyage #A12</p>
+                                    <p class="text-xs text-navy/60 truncate">Updated container load details for the upcoming port departure.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                    <option value="Spam">Spam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Invoice -->
+                        <div class="email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group" data-category="Invoice queries">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-amber-900 text-amber-100 font-extrabold flex items-center justify-center shrink-0 border border-amber-700 group-hover:scale-105 transition-transform shadow-sm">H</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate">Hapag-Lloyd Finance</h4>
+                                    <!-- Double Badge -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-amber-900 text-amber-100 border border-amber-700 text-[9px] font-extrabold rounded uppercase tracking-wide">Category: Invoice</span>
+                                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Classified</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Discrepancy in Terminal Handling Charge Invoice #INV-8821</p>
+                                    <p class="text-xs text-navy/60 truncate">Checking invoice balance against agreed contract rate.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                    <option value="Spam">Spam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 4: General -->
+                        <div class="email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group" data-category="General mail">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-slate-200 text-slate-800 font-extrabold flex items-center justify-center shrink-0 border border-slate-300 group-hover:scale-105 transition-transform shadow-sm">P</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate">Port Authority Notice</h4>
+                                    <!-- Double Badge -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-slate-200 text-slate-800 border border-slate-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Category: General</span>
+                                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Classified</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Scheduled System Maintenance on Sunday</p>
+                                    <p class="text-xs text-navy/60 truncate">Please be aware of temporary portal downtime during off-peak hours.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                    <option value="Spam">Spam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== 2. HUMAN REVIEW VIEW (FRIEND'S ORIGINAL CODE) ===================== -->
+            <div id="view-human-review" class="hidden space-y-6 max-w-6xl mx-auto">
+
+                <div id="hr-sub-dashboard" class="space-y-6">
+                    <!-- Page Title Header -->
+                    <div>
+                        <h2 class="text-2xl font-black text-navy">Human Review</h2>
+                        <p class="text-xs font-medium text-navy/70 mt-1">Review emails and attachments that require manual action.</p>
+                    </div>
+
+                    <!-- Top 2 Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        <!-- CARD 1 — UNREADABLE ATTACHMENTS -->
+                        <div class="bg-white rounded-2xl p-6 border-2 gold-border-solid shadow-md flex flex-col justify-between space-y-4 hover:shadow-lg transition">
+                            <div class="flex items-start justify-between">
+                                <div class="space-y-1">
+                                    <p class="text-sm font-extrabold text-navy">Unreadable Attachments</p>
+                                    <p class="text-4xl font-black text-gold">3</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-gold border gold-border flex items-center justify-center text-xl shadow-sm">
+                                    <i class="fa-solid fa-file-circle-exclamation"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-navy/70 leading-relaxed">Attachments that could not be read or processed.</p>
+                            <button onclick="switchReviewSubPage('unreadable-list')" class="w-full py-2.5 px-4 gold-gradient text-navy-dark font-extrabold text-xs rounded-xl shadow hover:brightness-105 transition flex items-center justify-center space-x-2">
+                                <span>Review Unreadable</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+
+                        <!-- CARD 2 — CORRUPTED EMAILS -->
+                        <div class="bg-white rounded-2xl p-6 border-2 border-rose-300 shadow-md flex flex-col justify-between space-y-4 hover:shadow-lg transition">
+                            <div class="flex items-start justify-between">
+                                <div class="space-y-1">
+                                    <p class="text-sm font-extrabold text-navy">Corrupted Emails</p>
+                                    <p class="text-4xl font-black text-rose-600">2</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center text-xl shadow-sm">
+                                    <i class="fa-solid fa-envelope-circle-check"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-navy/70 leading-relaxed">Emails that could not be processed correctly.</p>
+                            <button onclick="switchReviewSubPage('corrupted-list')" class="w-full py-2.5 px-4 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
+                                <span>Review Corrupted</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- Additional Summary -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-black text-gold-dark uppercase tracking-wider">Review Summary</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div class="bg-white p-4 rounded-xl border gold-border shadow-sm">
+                                <p class="text-[11px] font-bold text-navy/60">Total Human Review Cases</p>
+                                <p class="text-xl font-black text-navy mt-1">5</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border gold-border shadow-sm">
+                                <p class="text-[11px] font-bold text-navy/60">Unreadable Attachments</p>
+                                <p class="text-xl font-black text-gold mt-1">3</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border gold-border shadow-sm">
+                                <p class="text-[11px] font-bold text-navy/60">Corrupted Emails</p>
+                                <p class="text-xl font-black text-rose-600 mt-1">2</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border gold-border shadow-sm">
+                                <p class="text-[11px] font-bold text-navy/60">Resolved Today</p>
+                                <p class="text-xl font-black text-emerald-600 mt-1">4</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Human Review Activity -->
+                    <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                        <div class="bg-navy-surface px-5 py-3.5 border-b gold-border">
+                            <h3 class="text-xs font-extrabold text-gold uppercase tracking-wider">Recent Review Activity</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-ivory border-b gold-border text-navy font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Email</th>
+                                        <th class="p-3.5">Issue</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5">Received</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gold/15 text-navy font-medium">
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">Maersk Freight Services</td>
+                                        <td class="p-3.5 text-navy/80">Unreadable PDF attachment</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending</span></td>
+                                        <td class="p-3.5 font-mono text-navy/70">10:42 AM</td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('unreadable-detail')" class="px-3 py-1 gold-gradient text-navy-dark font-extrabold text-[11px] rounded-lg shadow-sm">Review</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">COSCO Shipping</td>
+                                        <td class="p-3.5 text-navy/80">Corrupted email body</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending</span></td>
+                                        <td class="p-3.5 font-mono text-navy/70">Yesterday</td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('corrupted-detail')" class="px-3 py-1 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-[11px] rounded-lg shadow-sm">Review</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">Hapag-Lloyd Finance</td>
+                                        <td class="p-3.5 text-navy/80">Unreadable invoice attachment</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-md font-bold text-[10px]">Resolved</span></td>
+                                        <td class="p-3.5 font-mono text-navy/70">Sep 18</td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('unreadable-detail')" class="px-3 py-1 bg-navy text-gold border gold-border font-extrabold text-[11px] rounded-lg shadow-sm">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hr-sub-unreadable-list" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button onclick="switchReviewSubPage('dashboard')" class="text-xs font-bold text-gold-dark hover:underline flex items-center mb-1">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Back to Dashboard
+                            </button>
+                            <h2 class="text-xl font-black text-navy">Unreadable Attachments</h2>
+                            <p class="text-xs text-navy/70 mt-0.5">Review documents that could not be read or extracted successfully.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-navy text-gold font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Sender</th>
+                                        <th class="p-3.5">Email Subject</th>
+                                        <th class="p-3.5">Attachment</th>
+                                        <th class="p-3.5">Problem</th>
+                                        <th class="p-3.5">Received</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gold/15 text-navy">
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">Maersk Freight Services</td>
+                                        <td class="p-3.5 font-semibold text-navy/90">"Q3 Rate Comparison Matrix for Asia-Pacific Routes"</td>
+                                        <td class="p-3.5 font-mono text-xs gold-text font-bold">Rate_Comparison.pdf</td>
+                                        <td class="p-3.5 text-navy/80">PDF content could not be extracted.</td>
+                                        <td class="p-3.5 font-mono text-navy/60">10:42 AM</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending Review</span></td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('unreadable-detail')" class="px-3 py-1.5 gold-gradient text-navy-dark font-extrabold text-xs rounded-lg shadow-sm whitespace-nowrap">Open Review</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hr-sub-unreadable-detail" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button onclick="switchReviewSubPage('unreadable-list')" class="text-xs font-bold text-gold-dark hover:underline flex items-center mb-1">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Back to Unreadable List
+                            </button>
+                            <h2 class="text-xl font-black text-navy">Review Unreadable Attachment</h2>
+                        </div>
+                    </div>
+
+                    <!-- Email Information Summary -->
+                    <div class="bg-white rounded-2xl p-4 border gold-border shadow-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Sender</p>
+                            <p class="font-extrabold text-navy mt-0.5">Maersk Freight Services</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Subject</p>
+                            <p class="font-extrabold text-navy mt-0.5 truncate">Q3 Rate Comparison Matrix</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Attachment</p>
+                            <p class="font-mono font-bold text-gold mt-0.5">Rate_Comparison.pdf</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Issue</p>
+                            <p class="font-semibold text-rose-700 mt-0.5">Unable to extract content</p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Panel -->
+                    <div class="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl flex items-start space-x-3 text-xs">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg mt-0.5"></i>
+                        <div>
+                            <p class="font-extrabold text-amber-950">Document could not be processed</p>
+                            <p class="text-amber-900 mt-0.5">Please manually inspect the original attachment and determine the appropriate action.</p>
+                        </div>
+                    </div>
+
+                    <!-- Split Layout Preview & Controls -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Side 1: Original Email Preview -->
+                        <div class="bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-3">
+                            <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">Original Email Preview</h3>
+                            <div class="p-3 bg-ivory rounded-xl text-xs space-y-2 text-navy/80 font-mono">
+                                <p><strong class="text-navy">From:</strong> rate-desk@maersk-freight.com</p>
+                                <p><strong class="text-navy">Date:</strong> Today, 10:42 AM</p>
+                                <p><strong class="text-navy">Subject:</strong> Q3 Rate Comparison Matrix for Asia-Pacific Routes</p>
+                                <hr class="border-gold/20 my-2">
+                                <p class="text-navy font-sans text-xs">Dear Port Ops,<br><br>Attached is our revised Q3 rate matrix file (<code class="bg-white px-1 font-mono">Rate_Comparison.pdf</code>). Please update the automated pricing comparison database accordingly.</p>
+                            </div>
+                        </div>
+
+                        <!-- Side 2: Problem Information & Action Options -->
+                        <div class="bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-4 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">Attachment & Problem Information</h3>
+                                <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl space-y-2 text-xs">
+                                    <p class="font-bold text-rose-900"><i class="fa-solid fa-bug mr-1"></i> Extraction Error Log</p>
+                                    <p class="text-rose-800 font-mono text-[11px]">ERR_OCR_UNREADABLE_FONT_ENCODING: PDF text stream corrupted or password protected.</p>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="space-y-2 pt-4 border-t gold-border">
+                                <button onclick="alert('Case marked as Resolved.'); switchReviewSubPage('dashboard');" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition">
+                                    <i class="fa-solid fa-circle-check mr-1"></i> Mark as Resolved
+                                </button>
+                                <button onclick="alert('New attachment request sent to sender.'); switchReviewSubPage('dashboard');" class="w-full py-2.5 bg-navy hover:bg-navy-light text-gold border gold-border font-extrabold text-xs rounded-xl shadow transition">
+                                    <i class="fa-solid fa-paper-plane mr-1"></i> Request New Attachment
+                                </button>
+                                <button onclick="alert('Case escalated to senior supervisor.'); switchReviewSubPage('dashboard');" class="w-full py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-800 font-extrabold text-xs rounded-xl border border-rose-300 transition">
+                                    <i class="fa-solid fa-shield-cat mr-1"></i> Escalate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hr-sub-corrupted-list" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button onclick="switchReviewSubPage('dashboard')" class="text-xs font-bold text-gold-dark hover:underline flex items-center mb-1">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Back to Dashboard
+                            </button>
+                            <h2 class="text-xl font-black text-navy">Corrupted Emails</h2>
+                            <p class="text-xs text-navy/70 mt-0.5">Review emails that could not be processed correctly.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-navy text-rose-300 font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Sender</th>
+                                        <th class="p-3.5">Subject</th>
+                                        <th class="p-3.5">Problem</th>
+                                        <th class="p-3.5">Received</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gold/15 text-navy">
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">COSCO Shipping</td>
+                                        <td class="p-3.5 font-semibold text-navy/90">Shipping Instructions – Vessel 908 Voyage #A12</td>
+                                        <td class="p-3.5 text-rose-700 font-medium">Email content is incomplete or corrupted</td>
+                                        <td class="p-3.5 font-mono text-navy/60">Yesterday</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending Review</span></td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('corrupted-detail')" class="px-3 py-1.5 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-xs rounded-lg shadow-sm whitespace-nowrap">Open Review</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">Global Marketing Deals</td>
+                                        <td class="p-3.5 font-semibold text-navy/90">Unsolicited commercial offer</td>
+                                        <td class="p-3.5 text-rose-700 font-medium">Malformed email content</td>
+                                        <td class="p-3.5 font-mono text-navy/60">Sep 17</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending Review</span></td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('corrupted-detail')" class="px-3 py-1.5 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-xs rounded-lg shadow-sm whitespace-nowrap">Open Review</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hr-sub-corrupted-detail" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button onclick="switchReviewSubPage('corrupted-list')" class="text-xs font-bold text-gold-dark hover:underline flex items-center mb-1">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Back to Corrupted List
+                            </button>
+                            <h2 class="text-xl font-black text-navy">Review Corrupted Email</h2>
+                        </div>
+                    </div>
+
+                    <!-- Header Meta Information -->
+                    <div class="bg-white rounded-2xl p-4 border gold-border shadow-sm grid grid-cols-2 sm:grid-cols-5 gap-4 text-xs">
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Sender</p>
+                            <p class="font-extrabold text-navy mt-0.5">COSCO Shipping</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Subject</p>
+                            <p class="font-extrabold text-navy mt-0.5 truncate">Shipping Instructions</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Received</p>
+                            <p class="font-mono font-bold text-navy mt-0.5">Yesterday</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Email ID</p>
+                            <p class="font-mono font-bold text-gold mt-0.5">MSG-9082-CORRUPT</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Processing Status</p>
+                            <p class="font-bold text-rose-600 mt-0.5">PARSER_FAILED</p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Panel -->
+                    <div class="p-4 bg-rose-50 border-2 border-rose-300 rounded-2xl flex items-start space-x-3 text-xs">
+                        <i class="fa-solid fa-circle-exclamation text-rose-600 text-lg mt-0.5"></i>
+                        <div>
+                            <p class="font-extrabold text-rose-950">Email processing failed</p>
+                            <p class="text-rose-900 mt-0.5"><strong class="font-bold">Reason:</strong> The email content could not be reliably parsed.</p>
+                        </div>
+                    </div>
+
+                    <!-- Available Email Evidence Section -->
+                    <div class="bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-4">
+                        <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">Available Email Evidence</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="space-y-2 p-3 bg-ivory rounded-xl border gold-border">
+                                <p><strong class="text-navy">Sender:</strong> COSCO Shipping Logistics &lt;ops@cosco-shipping.com&gt;</p>
+                                <p><strong class="text-navy">Subject:</strong> Shipping Instructions – Vessel 908 Voyage #A12</p>
+                                <p><strong class="text-navy">Timestamp:</strong> Sep 18, 2026, 14:10 UTC</p>
+                                <p><strong class="text-navy">Attachment Names:</strong> <code class="bg-white px-1 text-gold font-mono">SI_MANIFEST_V908.xml</code></p>
+                            </div>
+
+                            <div class="p-3 bg-rose-50/50 rounded-xl border border-rose-200 font-mono text-[11px] text-navy/80 space-y-1">
+                                <p class="font-extrabold text-rose-900 font-sans text-xs">Partial Email Preview:</p>
+                                <p class="text-navy">"Please find attached shipping instructions for container batch #8812... [TRUNCATED_NULL_BYTES]"</p>
+                                <p class="text-rose-600 font-bold italic mt-2">[MISSING / CORRUPTED DATA DETECTED IN MIME BODY ENCODING]</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-3 pt-2">
+                        <button onclick="alert('Corrupted Email marked as Resolved.'); switchReviewSubPage('dashboard');" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition">
+                            <i class="fa-solid fa-circle-check mr-1"></i> Mark as Resolved
+                        </button>
+                        <button onclick="alert('Resend request issued to sender.'); switchReviewSubPage('dashboard');" class="flex-1 py-2.5 bg-navy hover:bg-navy-light text-gold border gold-border font-extrabold text-xs rounded-xl shadow transition">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Request Resend
+                        </button>
+                        <button onclick="alert('Escalated to engineering.'); switchReviewSubPage('dashboard');" class="flex-1 py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-800 font-extrabold text-xs rounded-xl border border-rose-300 transition">
+                            <i class="fa-solid fa-shield-cat mr-1"></i> Escalate
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ===================== 3. SPAM FOLDER VIEW ===================== -->
+            <div id="view-spam" class="hidden space-y-5 max-w-7xl mx-auto">
+                <div class="flex items-center justify-between border-b gold-border pb-3">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-navy flex items-center">
+                            <i class="fa-solid fa-ban text-rose-500 mr-3"></i>Spam Folder
+                        </h2>
+                        <p class="text-xs text-navy/70 mt-1">Review, recover, or permanently delete flagged emails.</p>
+                    </div>
+                    
+                    <!-- Spam specific controls (Search + Empty) -->
+                    <div class="flex items-center space-x-3">
+                        <div class="relative w-64">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-rose-400 text-sm"></i>
+                            <input type="text" id="spam-search" oninput="applySpamSearch()" placeholder="Search spam..." 
+                                   class="w-full pl-10 pr-4 py-2 bg-rose-50 border border-rose-200 rounded-xl text-xs text-navy font-bold focus:outline-none focus:ring-2 focus:ring-rose-400 transition placeholder-rose-400">
+                        </div>
+                        <button onclick="emptySpam()" class="px-5 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 font-extrabold text-xs rounded-xl border border-rose-300 transition-all flex items-center shadow-sm whitespace-nowrap">
+                            <i class="fa-solid fa-trash-can mr-2"></i> Empty All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                    <div id="spam-list" class="divide-y divide-gold/15">
+                        
+                        <div class="spam-item p-4 hover:bg-rose-50/50 transition flex items-center justify-between group">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 font-extrabold flex items-center justify-center shrink-0 border border-rose-300">G</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate line-through decoration-rose-500">Global Marketing Deals</h4>
+                                    <!-- Double Badge for Spam -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Category: Spam</span>
+                                        <span class="px-2 py-0.5 bg-slate-200 text-slate-700 border border-slate-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Flagged</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Unsolicited commercial offer marked automatically</p>
+                                    <p class="text-xs text-navy/60 truncate">Special discount offer for logistics software suite.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                </select>
+                                <button onclick="deleteSpamRow(this)" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm transition transform hover:-translate-y-0.5 flex items-center opacity-0 group-hover:opacity-100">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="spam-empty-state" class="hidden bg-white p-12 text-center space-y-3">
+                        <div class="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-2xl mx-auto shadow-inner">
+                            <i class="fa-solid fa-shield-check"></i>
+                        </div>
+                        <h3 class="font-extrabold text-navy text-lg">Spam Folder is Empty</h3>
+                        <p class="text-xs text-navy/60 max-w-sm mx-auto">Hooray! There are no spam or malicious emails matching your view.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border-2 gold-border-solid relative">
+            <div class="flex items-center justify-between border-b gold-border pb-3">
+                <h3 class="font-extrabold text-navy text-base flex items-center">
+                    <i class="fa-solid fa-gear gold-text mr-2"></i> System Settings
+                </h3>
+                <button onclick="closeModal('settings-modal')" class="text-navy/50 hover:text-navy">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs text-navy">
+                <div class="flex items-center justify-between p-3 bg-ivory rounded-xl border gold-border">
+                    <span class="font-bold">Auto-Classification Engine</span>
+                    <span class="text-emerald-700 font-extrabold bg-emerald-100 px-2 py-0.5 rounded">ACTIVE</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-ivory rounded-xl border gold-border">
+                    <span class="font-bold">Color Theme</span>
+                    <span class="gold-text font-extrabold">Navy, Gold & Ivory</span>
+                </div>
+            </div>
+            <button onclick="closeModal('settings-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl shadow hover:brightness-105 transition">
+                Save & Close
+            </button>
+        </div>
+    </div>
+
+    <div id="notification-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border-2 gold-border-solid">
+            <div class="flex items-center justify-between border-b gold-border pb-2">
+                <h3 class="font-extrabold text-navy text-sm flex items-center">
+                    <i class="fa-solid fa-bell gold-text mr-2"></i> Notifications
+                </h3>
+                <button onclick="closeModal('notification-modal')" class="text-navy/50 hover:text-navy">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-3 bg-ivory border gold-border rounded-xl text-xs space-y-1">
+                <p class="font-bold text-navy">5 Human Review Cases Active</p>
+                <p class="text-navy/70">3 Unreadable Attachments & 2 Corrupted Emails require inspection.</p>
+            </div>
+            <button onclick="closeModal('notification-modal')" class="w-full py-2 bg-navy text-gold font-bold text-xs rounded-xl">
+                Acknowledge
+            </button>
+        </div>
+    </div>
+
+    <div id="logout-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border-2 gold-border-solid">
+            <div class="w-12 h-12 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center text-xl mx-auto border border-rose-200">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <div>
+                <h3 class="font-extrabold text-navy text-base">Confirm Logout</h3>
+                <p class="text-xs text-navy/60 mt-1">Are you sure you want to exit your HarryPort session?</p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="closeModal('logout-modal')" class="flex-1 py-2.5 bg-ivory text-navy font-bold text-xs rounded-xl border gold-border">
+                    Cancel
+                </button>
+                <button onclick="closeModal('logout-modal')" class="flex-1 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow">
+                    Log Out
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================== CORE LOGIC =====================
+
+        // 1. Advance Filter & Search for Inbox
+        function applyFilters() {
+            const query = document.getElementById('email-search').value.toLowerCase();
+            const activeCategory = document.getElementById('category-filter').value;
+            const rows = document.querySelectorAll('.email-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const cat = row.getAttribute('data-category');
+                const matchesCategory = (activeCategory === 'All') || (cat === activeCategory);
+                const matchesQuery = row.innerText.toLowerCase().includes(query);
+                
+                if (matchesCategory && matchesQuery) {
+                    row.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const countText = document.getElementById('showing-count');
+            if (query) {
+                countText.innerHTML = `Found <span class="text-gold font-bold">${visibleCount}</span> result(s) for "<span class="text-white">${document.getElementById('email-search').value}</span>"`;
+            } else {
+                countText.innerText = activeCategory === 'All' 
+                    ? `Showing all ${visibleCount} emails` 
+                    : `Showing ${visibleCount} email(s) in "${activeCategory}"`;
+            }
+        }
+
+        // 2. Specific Search for Spam
+        function applySpamSearch() {
+            const query = document.getElementById('spam-search').value.toLowerCase();
+            const rows = document.querySelectorAll('.spam-item');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const matchesQuery = row.innerText.toLowerCase().includes(query);
+                if (matchesQuery) {
+                    row.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const emptyState = document.getElementById('spam-empty-state');
+            if (visibleCount === 0 && rows.length > 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('h3').innerText = "No spam matched your search";
+            } else if (visibleCount > 0) {
+                emptyState.classList.add('hidden');
+            } else if (rows.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('h3').innerText = "Spam Folder is Empty";
+            }
+        }
+
+        // 3. Move Email Across Categories (WITH DOUBLE BADGE RE-IMPLEMENTATION)
+        function changeEmailCategory(selectElement) {
+            const newCategory = selectElement.value;
+            if (!newCategory) return;
+
+            const item = selectElement.closest('.spam-item') || selectElement.closest('.email-row');
+            
+            // Extract text cleanly without HTML tags
+            const rawSenderHTML = item.querySelector('h4').innerHTML;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = rawSenderHTML;
+            const cleanSender = tempDiv.innerText.replace(/<[^>]*>?/gm, ''); 
+            const initial = cleanSender.charAt(0).toUpperCase();
+
+            // Extract title and preview
+            const paragraphs = item.querySelectorAll('.min-w-0 > p');
+            const title = paragraphs[0] ? paragraphs[0].innerText : '';
+            const preview = paragraphs[1] ? paragraphs[1].innerText : '';
+            
+            item.remove();
+
+            let catBadgeClass = '';
+            let statusBadgeClass = '';
+            let statusText = '';
+            let iconClass = '';
+            let displayCategory = newCategory;
+
+            if (newCategory === 'Spam') {
+                iconClass = 'bg-rose-100 text-rose-800 border border-rose-300';
+                catBadgeClass = 'bg-rose-100 text-rose-800 border border-rose-300';
+                statusBadgeClass = 'bg-slate-200 text-slate-700 border border-slate-300';
+                statusText = 'Status: Flagged';
+                displayCategory = 'Spam';
+            } else {
+                statusBadgeClass = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+                statusText = 'Status: Classified';
+                
+                if (newCategory === 'Comparison requests') {
+                    catBadgeClass = iconClass = 'bg-navy text-gold border gold-border';
+                    displayCategory = 'Comparison';
+                } else if (newCategory === 'New SI requests') {
+                    catBadgeClass = iconClass = 'bg-amber-100 text-amber-900 border border-amber-300';
+                    displayCategory = 'New SI';
+                } else if (newCategory === 'Invoice queries') {
+                    catBadgeClass = iconClass = 'bg-amber-900 text-amber-100 border border-amber-700';
+                    displayCategory = 'Invoice';
+                } else if (newCategory === 'General mail') {
+                    catBadgeClass = iconClass = 'bg-slate-200 text-slate-800 border border-slate-300';
+                    displayCategory = 'General';
+                }
+            }
+
+            if (newCategory === 'Spam') {
+                const newRow = document.createElement('div');
+                newRow.className = 'spam-item p-4 hover:bg-rose-50/50 transition flex items-center justify-between group';
+                newRow.innerHTML = `
+                    <div class="flex items-center space-x-4 min-w-0">
+                        <div class="w-10 h-10 rounded-xl ${iconClass} font-extrabold flex items-center justify-center shrink-0">${initial}</div>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-sm text-navy truncate line-through decoration-rose-500">${cleanSender}</h4>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="px-2 py-0.5 ${catBadgeClass} text-[9px] font-extrabold rounded uppercase tracking-wide">Category: Spam</span>
+                                <span class="px-2 py-0.5 ${statusBadgeClass} text-[9px] font-extrabold rounded uppercase tracking-wide">${statusText}</span>
+                            </div>
+                            <p class="text-xs font-bold text-navy/90 truncate mt-1.5">${title}</p>
+                            <p class="text-xs text-navy/60 truncate">${preview}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center ml-4 shrink-0 space-x-2">
+                        <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                            <option value="" disabled selected>Move to...</option>
+                            <option value="Comparison requests">Comparison</option>
+                            <option value="New SI requests">New SI</option>
+                            <option value="Invoice queries">Invoice</option>
+                            <option value="General mail">General</option>
+                        </select>
+                        <button onclick="deleteSpamRow(this)" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm transition transform hover:-translate-y-0.5 flex items-center opacity-0 group-hover:opacity-100">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                document.getElementById('spam-list').appendChild(newRow);
+                document.getElementById('spam-empty-state').classList.add('hidden');
+                
+            } else {
+                const newRow = document.createElement('div');
+                newRow.className = `email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group`;
+                newRow.setAttribute('data-category', newCategory);
+                
+                newRow.innerHTML = `
+                    <div class="flex items-center space-x-4 min-w-0">
+                        <div class="w-10 h-10 rounded-xl ${iconClass} font-extrabold flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-sm">${initial}</div>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-sm text-navy truncate">${cleanSender}</h4>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="px-2 py-0.5 ${catBadgeClass} text-[9px] font-extrabold rounded uppercase tracking-wide">Category: ${displayCategory}</span>
+                                <span class="px-2 py-0.5 ${statusBadgeClass} text-[9px] font-extrabold rounded uppercase tracking-wide">${statusText}</span>
+                            </div>
+                            <p class="text-xs font-bold text-navy/90 truncate mt-1.5">${title}</p>
+                            <p class="text-xs text-navy/60 truncate">${preview}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center ml-4 shrink-0 space-x-2">
+                        <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                            <option value="" disabled selected>Move to...</option>
+                            <option value="Comparison requests">Comparison</option>
+                            <option value="New SI requests">New SI</option>
+                            <option value="Invoice queries">Invoice</option>
+                            <option value="General mail">General</option>
+                            <option value="Spam">Spam</option>
+                        </select>
+                    </div>
+                `;
+                document.getElementById('email-list').appendChild(newRow);
+            }
+
+            updateCategoryCounts();
+            applyFilters();
+            applySpamSearch();
+        }
+
+        // 4. Update Sidebar Stats
+        function updateCategoryCounts() {
+            const inboxRows = document.querySelectorAll('.email-row');
+            const counts = {
+                'Comparison requests': 0,
+                'New SI requests': 0,
+                'Invoice queries': 0,
+                'General mail': 0
+            };
+            let total = 0;
+            inboxRows.forEach(row => {
+                const cat = row.getAttribute('data-category');
+                if (counts.hasOwnProperty(cat)) {
+                    counts[cat]++;
+                }
+                total++;
+            });
+
+            document.getElementById('sidebar-count-comparison').innerText = counts['Comparison requests'];
+            document.getElementById('sidebar-count-si').innerText = counts['New SI requests'];
+            document.getElementById('sidebar-count-invoice').innerText = counts['Invoice queries'];
+            document.getElementById('sidebar-count-general').innerText = counts['General mail'];
+
+            document.getElementById('opt-all').innerText = `All Categories (${total})`;
+            document.getElementById('opt-comparison').innerText = `Comparison requests (${counts['Comparison requests']})`;
+            document.getElementById('opt-si').innerText = `New SI requests (${counts['New SI requests']})`;
+            document.getElementById('opt-invoice').innerText = `Invoice queries (${counts['Invoice queries']})`;
+            document.getElementById('opt-general').innerText = `General mail (${counts['General mail']})`;
+
+            updateSpamCountUI();
+        }
+
+        function deleteSpamRow(btn) {
+            btn.closest('.spam-item').remove();
+            updateSpamCountUI();
+            applySpamSearch();
+        }
+
+        function emptySpam() {
+            document.getElementById('spam-list').innerHTML = '';
+            updateSpamCountUI();
+            applySpamSearch();
+        }
+
+        function updateSpamCountUI() {
+            const spamCount = document.querySelectorAll('.spam-item').length;
+            document.getElementById('sidebar-count-spam').innerText = spamCount;
+            if (spamCount === 0) {
+                document.getElementById('spam-empty-state').classList.remove('hidden');
+                document.getElementById('spam-empty-state').querySelector('h3').innerText = "Spam Folder is Empty";
+            }
+        }
+
+        // 5. Sidebar Integrations
+        function selectCategoryFromSidebar(category) {
+            switchView('inbox');
+            document.getElementById('category-filter').value = category;
+            document.getElementById('email-search').value = ''; 
+            applyFilters();
+        }
+
+        // 6. View Switcher (Handles Inbox, HR, Spam)
+        function switchView(view) {
+            const isInbox = view === 'inbox';
+            const isReview = view === 'human-review';
+            const isSpam = view === 'spam';
+
+            document.getElementById('view-inbox').classList.toggle('hidden', !isInbox);
+            document.getElementById('view-human-review').classList.toggle('hidden', !isReview);
+            
+            const spamView = document.getElementById('view-spam');
+            if(spamView) spamView.classList.toggle('hidden', !isSpam);
+
+            if (isInbox) document.getElementById('page-title').innerText = 'Inbox';
+            else if (isReview) document.getElementById('page-title').innerText = 'Human Review';
+            else if (isSpam) document.getElementById('page-title').innerText = 'Spam Folder';
+            
+            document.getElementById('email-search').value = '';
+            const spamSearch = document.getElementById('spam-search');
+            if(spamSearch) spamSearch.value = '';
+            
+            applyFilters();
+            applySpamSearch();
+        }
+
+        // 7. Friend's Original Sub-Navigation Function (Preserved)
+        function switchReviewSubPage(subPage) {
+            switchView('human-review');
+
+            const pages = [
+                'hr-sub-dashboard', 
+                'hr-sub-unreadable-list', 
+                'hr-sub-unreadable-detail', 
+                'hr-sub-corrupted-list', 
+                'hr-sub-corrupted-detail'
+            ];
+
+            pages.forEach(p => {
+                const el = document.getElementById(p);
+                if (el) el.classList.add('hidden');
+            });
+
+            const target = document.getElementById('hr-sub-' + subPage);
+            if (target) target.classList.remove('hidden');
+        }
+
+        // Minor Utilities
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('w-64');
+            sidebar.classList.toggle('w-20');
+            document.querySelectorAll('.sidebar-text').forEach(el => el.classList.toggle('hidden'));
+            document.getElementById('brand-text').classList.toggle('hidden');
+        }
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        window.onload = function() {
+            updateCategoryCounts();
+        };
+    </script>
+</body>
+</html>
