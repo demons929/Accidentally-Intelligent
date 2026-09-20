@@ -1,0 +1,48 @@
+<div id="logout-modal"
+     class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 border-2 gold-border-solid">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b gold-border pb-3">
+
+            <h3 class="font-extrabold text-navy text-base flex items-center">
+                <i class="fa-solid fa-right-from-bracket gold-text mr-2"></i>
+                Sign Out
+            </h3>
+        </div>
+
+        <!-- Message -->
+        <div class="mt-5 text-center">
+
+            <div class="w-12 h-12 mx-auto rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
+                <i class="fa-solid fa-arrow-right-from-bracket text-lg"></i>
+            </div>
+
+            <p class="text-navy font-bold text-sm mt-4">
+                Are you sure you want to sign out?
+            </p>
+
+            <p class="text-navy/50 text-xs mt-1">
+                You will be signed out of your account.
+            </p>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex space-x-3 mt-6">
+
+            <button onclick="closeLogoutModal()"
+                    class="flex-1 py-2.5 rounded-xl border gold-border text-navy font-bold text-xs hover:bg-ivory transition">
+                Cancel
+            </button>
+
+            <button onclick="confirmLogout()"
+                    class="flex-1 py-2.5 rounded-xl bg-rose-500 text-white font-bold text-xs hover:bg-rose-600 transition">
+                Sign Out
+            </button>
+
+        </div>
+
+    </div>
+</div>

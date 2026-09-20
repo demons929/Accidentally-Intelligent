@@ -305,9 +305,7 @@
 
                 if (user && pass) {
                     showNotification('Sign-in successful! Welcome to HarryPort.', true);
-                    document.getElementById('signInForm').classList.add('hidden');
-                    document.getElementById('dashboardView').classList.remove('hidden');
-                    document.getElementById('dashUser').innerText = user;
+                    window.location.href = "frontpagewithmove.html";
                 } else {
                     showNotification('Please fill in both email and password.', false);
                 }
