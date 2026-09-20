@@ -5,7 +5,7 @@ import json
 import sys
 from pathlib import Path
 
-from pipeline_final import CATEGORIES, REQUIRED_FIELDS, run_pipeline
+from pipeline_ai import CATEGORIES, REQUIRED_FIELDS, run_pipeline
 
 
 VALID_STATUSES = {"OK", "MISMATCH", "NEEDS_REVIEW"}
