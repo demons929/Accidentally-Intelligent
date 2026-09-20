@@ -32,16 +32,46 @@ Our solution is a modular, end-to-end pipeline that seamlessly bridges backend A
 5. **Interactive Frontend (`login.html`, `frontpage.html`, `Comparison.html`)**: A clean, intuitive web interface where workers can log in, view the AI's classifications, and easily step in *only* when the AI flags an item it cannot confidently solve.
 6. **Resources (`/resources`)**: Centralized static assets, configurations, and model references.
 
-> 📸 **[Insert Screenshot 1]**: *Architecture Diagram or Flowchart*  
-> *(Tip: Add a simple Excalidraw or draw.io diagram here showing: Email Input → loader.py → pipeline.py (AI Classify SI/BL) → validate_pipeline.py → submission.json → Frontend Dashboard)*
+```mermaid
+graph TD
+    A[📧 Receive Email] --> B[⚙️ Pre-processing<br/>Generate submission.json]
+    B --> C[🌐 Connect to HTML<br/>Identify Name & Add Attachment Column for SI/BL]
+    C --> D{🤖 Classify Email}
+    
+    D -- "SI / BL Documents" --> E[📊 Extract 7 Key Fields<br/>Display & Show Comparison Result]
+    D -- "Others / Unknown" --> F[📂 Route to Manual Handling]
+    
+    E --> G{✅ Validation Check}
+    
+    G -- "All Fields Valid" --> H[💾 Finalize Submission]
+    G -- "Unreadable File or<br/>Missing Value ️" --> I[👨‍💻 Human Review Page]
+    
+    I --> J[🔴 Mismatched Fields<br/>Highlighted in Red]
+    J --> K[ Provide 'Confirm' or<br/>'Edit' Button to Fix Data]
+    K --> H
+
+    %% Styling
+    style A fill:#4FC3F7,stroke:#0277BD,stroke-width:3px,color:#000000
+    style B fill:#9575CD,stroke:#5E35B1,stroke-width:3px,color:#FFFFFF
+    style C fill:#9575CD,stroke:#5E35B1,stroke-width:3px,color:#FFFFFF
+    style D fill:#FFB74D,stroke:#EF6C00,stroke-width:3px,color:#000000
+    style E fill:#81C784,stroke:#388E3C,stroke-width:3px,color:#000000
+    style F fill:#E57373,stroke:#D32F2F,stroke-width:3px,color:#FFFFFF
+    style G fill:#FFB74D,stroke:#EF6C00,stroke-width:3px,color:#000000
+    style H fill:#81C784,stroke:#388E3C,stroke-width:3px,color:#000000
+    style I fill:#E57373,stroke:#D32F2F,stroke-width:3px,color:#FFFFFF
+    style J fill:#FFCDD2,stroke:#C62828,stroke-width:3px,color:#000000
+    style K fill:#FFCDD2,stroke:#C62828,stroke-width:3px,color:#000000
+```
 
 ---
 
 ## ⚙️ Implementation Details
-- **Human-in-the-Loop (HITL) Design**: The system is built on the principle of "management by exception." The AI handles 80-90% of routine classifications, routing only low-confidence or ambiguous cases to human workers.
-- **Dynamic Comparison UI**: The `Comparison.html` module allows reviewers to quickly view the AI's suggested classification side-by-side with the original email content, enabling rapid verification.
-- **Robust Error Handling**: The validation pipeline ensures that malformed data or unexpected email formats fail gracefully, preventing system crashes and maintaining auditability.
-- **Hackathon-Agile Development**: Clear separation of concerns allowed our team to parallelize work, with backend members optimizing the classification logic while frontend members built the interactive review dashboard.
+- **Smart Pre-processing**: Incoming emails are automatically parsed into a structured `submission.json` format. The system identifies the sender's name and dynamically adds an attachment column specifically for SI and BL documents.
+- **7-Point Field Extraction**: For classified SI and BL emails, the AI automatically extracts 7 key data fields and displays them alongside a comparison result for quick verification.
+- **Visual Error Highlighting**: In the Human Review interface, any mismatched fields or missing values are automatically **highlighted in red**, drawing the reviewer's attention exactly where it's needed.
+- **Interactive Human-in-the-Loop**: When an unreadable file or missing value is detected, it is routed to a dedicated review page. The system states the exact reason for the flag and provides **"Confirm" or "Edit" buttons**, allowing workers to quickly fix the field data without leaving the dashboard.
+- **Edge Case Handling**: Emails classified as "Others" are seamlessly routed to a separate manual handling flow, ensuring the AI only processes what it's trained for.
 
 > 📸 **[Insert Screenshot 2]**: *Frontend Dashboard*  
 > *(Tip: Add a screenshot of your `frontpage.html` or `Comparison.html` showing the AI classification in action!)*
