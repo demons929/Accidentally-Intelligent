@@ -38,180 +38,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --color-navy: #182536;
-            --color-gold: #C6A15B;
-            --color-ivory: #F2E9DA;
-        }
+    <link rel="stylesheet" href="css/style.css">
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #F2E9DA;
-            color: #182536;
-        }
-
-        .gold-gradient {
-            background: linear-gradient(135deg, #d9b675 0%, #C6A15B 50%, #9e7a35 100%);
-        }
-
-        .gold-border {
-            border-color: rgba(198, 161, 91, 0.35);
-        }
-
-        .gold-border-solid {
-            border-color: #C6A15B;
-        }
-
-        .gold-text {
-            color: #C6A15B;
-        }
-
-        .gold-active-nav {
-            background: linear-gradient(90deg, rgba(198, 161, 91, 0.15) 0%, rgba(198, 161, 91, 0.02) 100%);
-            border-left: 4px solid #C6A15B;
-            color: #C6A15B;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(242, 233, 218, 0.3);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(198, 161, 91, 0.4);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(198, 161, 91, 0.7);
-        }
-    </style>
 </head>
 <body class="h-screen w-screen flex overflow-hidden bg-ivory">
 
-    <aside id="sidebar" class="w-64 bg-navy text-ivory flex flex-col justify-between h-full border-r gold-border shrink-0 relative z-20 shadow-xl transition-all duration-300">
-        <div>
-            <!-- Logo Section -->
-            <div class="h-16 flex items-center px-4 border-b gold-border justify-between bg-navy-dark/40">
-                <div class="flex items-center space-x-3 overflow-hidden">
-                    <img src="resources/image/logo.png" alt="HarryPort Logo" 
-                         onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2942/2942544.png';" 
-                         class="h-9 w-9 object-contain shrink-0 filter drop-shadow-md">
-                    <span id="brand-text" class="font-extrabold text-lg text-ivory tracking-wide whitespace-nowrap">
-                        Harry<span class="gold-text">Port</span>
-                    </span>
-                </div>
-            </div>
-
-            <!-- Navigation Links -->
-            <nav class="p-3 space-y-1.5">
-                <button onclick="selectCategoryFromSidebar('All')" id="nav-inbox" class="w-full flex items-center p-2.5 gold-active-nav font-bold rounded-r-xl transition">
-                    <i class="fa-solid fa-inbox w-6 text-center gold-text"></i>
-                    <span class="sidebar-text ml-3 text-sm whitespace-nowrap">Inbox</span>
-                </button>
-                <button onclick="switchReviewSubPage('dashboard')" id="nav-review" class="w-full flex items-center p-2.5 text-ivory/80 hover:text-ivory hover:bg-navy-light/50 font-semibold rounded-xl transition">
-                    <i class="fa-solid fa-triangle-exclamation w-6 text-center gold-text"></i>
-                    <span class="sidebar-text ml-3 text-sm whitespace-nowrap">Human Review</span>
-                    <span id="review-badge" class="sidebar-text ml-auto gold-gradient text-navy-dark text-xs font-black py-0.5 px-2 rounded-full shadow-sm">5</span>
-                </button>
-            </nav>
-
-            <!-- Categories Section -->
-            <div class="px-3 py-2 mt-2">
-                <div class="flex items-center justify-between px-2 mb-2">
-                    <p class="sidebar-text text-[11px] font-extrabold gold-text uppercase tracking-widest">Categories</p>
-                    <span class="sidebar-text text-[10px] text-ivory/50 font-mono">LIVE COUNT</span>
-                </div>
-                <ul class="space-y-1">
-                    <li onclick="selectCategoryFromSidebar('Comparison requests')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
-                        <div class="flex items-center min-w-0">
-                            <span class="w-2.5 h-2.5 rounded-full bg-gold shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
-                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Comparison requests</span>
-                        </div>
-                        <span id="sidebar-count-comparison" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
-                    </li>
-                    <li onclick="selectCategoryFromSidebar('New SI requests')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
-                        <div class="flex items-center min-w-0">
-                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
-                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">New SI requests</span>
-                        </div>
-                        <span id="sidebar-count-si" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
-                    </li>
-                    <li onclick="selectCategoryFromSidebar('Invoice queries')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
-                        <div class="flex items-center min-w-0">
-                            <span class="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
-                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Invoice queries</span>
-                        </div>
-                        <span id="sidebar-count-invoice" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
-                    </li>
-                    <li onclick="selectCategoryFromSidebar('General mail')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
-                        <div class="flex items-center min-w-0">
-                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
-                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">General mail</span>
-                        </div>
-                        <span id="sidebar-count-general" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
-                    </li>
-                    <li onclick="switchView('spam')" id="nav-spam" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-rose-950/40 hover:text-rose-400 rounded-lg cursor-pointer transition group mt-2 border border-transparent hover:border-rose-900/50">
-                        <div class="flex items-center min-w-0">
-                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
-                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Spam Folder</span>
-                        </div>
-                        <span id="sidebar-count-spam" class="sidebar-text text-xs font-bold bg-rose-950/50 border border-rose-900/50 text-rose-400 px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Footer / Settings -->
-        <div class="p-3 border-t gold-border space-y-1 bg-navy-dark/30">
-            <button onclick="openModal('settings-modal')" class="w-full flex items-center p-2 text-ivory/80 hover:text-gold hover:bg-navy-light/50 rounded-lg transition">
-                <i class="fa-solid fa-gear w-6 text-center gold-text"></i>
-                <span class="sidebar-text ml-3 text-sm font-semibold whitespace-nowrap">Settings</span>
-            </button>
-            <button onclick="openModal('logout-modal')" class="w-full flex items-center p-2 text-rose-300 hover:text-rose-200 hover:bg-rose-950/40 rounded-lg transition">
-                <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center"></i>
-                <span class="sidebar-text ml-3 text-sm font-semibold whitespace-nowrap">Log Out</span>
-            </button>
-        </div>
-    </aside>
+    <div id="sidebar-container"></div>
 
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-ivory">
         
-        <!-- Header -->
-        <header class="h-16 bg-navy text-ivory flex items-center justify-between px-6 border-b gold-border shrink-0 z-10 shadow-md">
-            <div class="flex items-center space-x-4">
-                <button onclick="toggleSidebar()" class="text-ivory/80 hover:text-gold p-2 rounded-lg hover:bg-navy-light/50 transition">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-                <div class="flex items-center space-x-3">
-                    <h1 id="page-title" class="font-extrabold text-lg text-ivory tracking-wide">Inbox</h1>
-                    <span class="hidden md:inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full border gold-border text-gold bg-navy-light">
-                        HarryPort Operations
-                    </span>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-4">
-                <button onclick="openModal('notification-modal')" class="p-2 text-ivory/80 hover:text-gold hover:bg-navy-light/50 rounded-lg transition relative">
-                    <i class="fa-solid fa-bell text-lg"></i>
-                    <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 gold-gradient rounded-full border border-navy shadow-sm"></span>
-                </button>
-
-                <div class="h-6 w-px bg-gold/20"></div>
-
-                <div class="flex items-center space-x-3 cursor-pointer p-1.5 rounded-xl hover:bg-navy-light/50 transition border border-transparent hover:border-gold/30">
-                    <div class="w-9 h-9 rounded-xl gold-gradient text-navy-dark flex items-center justify-center font-black text-sm shadow-md border border-ivory/20">
-                        C
-                    </div>
-                    <div class="hidden sm:block text-left">
-                        <p class="text-xs font-bold text-ivory leading-none">Captain</p>
-                        <p class="text-[10px] text-gold font-medium mt-0.5">Port Administrator</p>
-                    </div>
-                </div>
-            </div>
-        </header>
+       <!-- Header -->
+        <div id="header-container"></div>
 
         <div class="flex-1 overflow-y-auto p-6 bg-ivory">
 
@@ -249,7 +86,7 @@
                     <div id="email-list" class="divide-y divide-gold/15">
                         
                         <!-- Row 1: Comparison -->
-                        <div class="email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group" data-category="Comparison requests">
+                        <div class="email-row p-4 transition cursor-pointer flex items-center justify-between group" data-category="Comparison requests">
                             <div class="flex items-center space-x-4 min-w-0">
                                 <div class="w-10 h-10 rounded-xl bg-navy text-gold font-extrabold flex items-center justify-center shrink-0 border gold-border group-hover:scale-105 transition-transform shadow-sm">M</div>
                                 <div class="min-w-0">
@@ -276,7 +113,7 @@
                         </div>
 
                         <!-- Row 2: New SI -->
-                        <div class="email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group" data-category="New SI requests">
+                        <div class="email-row p-4 transition cursor-pointer flex items-center justify-between group" data-category="New SI requests">
                             <div class="flex items-center space-x-4 min-w-0">
                                 <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 font-extrabold flex items-center justify-center shrink-0 border border-amber-300 group-hover:scale-105 transition-transform shadow-sm">C</div>
                                 <div class="min-w-0">
@@ -303,7 +140,7 @@
                         </div>
 
                         <!-- Row 3: Invoice -->
-                        <div class="email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group" data-category="Invoice queries">
+                        <div class="email-row p-4 transition cursor-pointer flex items-center justify-between group" data-category="Invoice queries">
                             <div class="flex items-center space-x-4 min-w-0">
                                 <div class="w-10 h-10 rounded-xl bg-amber-900 text-amber-100 font-extrabold flex items-center justify-center shrink-0 border border-amber-700 group-hover:scale-105 transition-transform shadow-sm">H</div>
                                 <div class="min-w-0">
@@ -330,7 +167,7 @@
                         </div>
 
                         <!-- Row 4: General -->
-                        <div class="email-row p-4 hover:bg-ivory-light/80 transition cursor-pointer flex items-center justify-between group" data-category="General mail">
+                        <div class="email-row p-4 transition cursor-pointer flex items-center justify-between group" data-category="General mail">
                             <div class="flex items-center space-x-4 min-w-0">
                                 <div class="w-10 h-10 rounded-xl bg-slate-200 text-slate-800 font-extrabold flex items-center justify-center shrink-0 border border-slate-300 group-hover:scale-105 transition-transform shadow-sm">P</div>
                                 <div class="min-w-0">
@@ -767,7 +604,7 @@
                             <div class="flex items-center space-x-4 min-w-0">
                                 <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 font-extrabold flex items-center justify-center shrink-0 border border-rose-300">G</div>
                                 <div class="min-w-0">
-                                    <h4 class="font-bold text-sm text-navy truncate line-through decoration-rose-500">Global Marketing Deals</h4>
+                                    <h4 class="font-bold text-sm text-navy truncate decoration-rose-500">Global Marketing Deals</h4>
                                     <!-- Double Badge for Spam -->
                                     <div class="flex items-center space-x-2 mt-1">
                                         <span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Category: Spam</span>
@@ -808,49 +645,58 @@
     <!-- Modals -->
     <div id="settings-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border-2 gold-border-solid relative">
+
+            <!-- Header -->
             <div class="flex items-center justify-between border-b gold-border pb-3">
-                <h3 class="font-extrabold text-navy text-base flex items-center">
-                    <i class="fa-solid fa-gear gold-text mr-2"></i> System Settings
+                    <h3 class="font-extrabold text-navy text-base flex items-center">
+                    <i class="fa-solid fa-gear gold-text mr-2"></i>
+                    System Settings
                 </h3>
+
                 <button onclick="closeModal('settings-modal')" class="text-navy/50 hover:text-navy">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div class="space-y-3 text-xs text-navy">
-                <div class="flex items-center justify-between p-3 bg-ivory rounded-xl border gold-border">
-                    <span class="font-bold">Auto-Classification Engine</span>
-                    <span class="text-emerald-700 font-extrabold bg-emerald-100 px-2 py-0.5 rounded">ACTIVE</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-ivory rounded-xl border gold-border">
-                    <span class="font-bold">Color Theme</span>
-                    <span class="gold-text font-extrabold">Navy, Gold & Ivory</span>
-                </div>
-            </div>
-            <button onclick="closeModal('settings-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl shadow hover:brightness-105 transition">
-                Save & Close
-            </button>
-        </div>
-    </div>
 
-    <div id="notification-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border-2 gold-border-solid">
-            <div class="flex items-center justify-between border-b gold-border pb-2">
-                <h3 class="font-extrabold text-navy text-sm flex items-center">
-                    <i class="fa-solid fa-bell gold-text mr-2"></i> Notifications
-                </h3>
-                <button onclick="closeModal('notification-modal')" class="text-navy/50 hover:text-navy">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+        <!-- Appearance -->
+        <div class="space-y-3 text-xs text-navy">
+
+            <div class="flex items-center justify-between p-4 bg-ivory rounded-xl border gold-border">
+
+                <div>
+                    <span class="font-bold block text-sm">Appearance</span>
+                    <span id="theme-label" class="text-navy/50 text-[11px]">
+                        Light Mode
+                    </span>
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <button
+                    id="theme-toggle"
+                    onclick="toggleDarkMode()"
+                    class="relative w-14 h-7 bg-gold rounded-full transition duration-300 focus:outline-none"
+                    aria-label="Toggle dark mode"
+                >
+                    <span
+                        id="theme-toggle-circle"
+                        class="absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300"
+                    ></span>
                 </button>
+
             </div>
-            <div class="p-3 bg-ivory border gold-border rounded-xl text-xs space-y-1">
-                <p class="font-bold text-navy">5 Human Review Cases Active</p>
-                <p class="text-navy/70">3 Unreadable Attachments & 2 Corrupted Emails require inspection.</p>
-            </div>
-            <button onclick="closeModal('notification-modal')" class="w-full py-2 bg-navy text-gold font-bold text-xs rounded-xl">
-                Acknowledge
-            </button>
+
         </div>
-    </div>
+
+        <!-- Save & Close -->
+        <button
+            onclick="closeModal('settings-modal')"
+            class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl shadow hover:brightness-105 transition"
+        >
+            Save & Close
+        </button>
+
+        </div>
+        </div>
 
     <div id="logout-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border-2 gold-border-solid">
@@ -1108,35 +954,130 @@
         }
 
         // 5. Sidebar Integrations
-        function selectCategoryFromSidebar(category) {
+        /*function selectCategoryFromSidebar(category) {
             switchView('inbox');
             document.getElementById('category-filter').value = category;
             document.getElementById('email-search').value = ''; 
             applyFilters();
+        }*/
+        function selectCategoryFromSidebar(category) {
+        // Show Inbox view
+        document.getElementById('view-inbox').classList.remove('hidden');
+        document.getElementById('view-human-review').classList.add('hidden');
+
+        const spamView = document.getElementById('view-spam');
+        if (spamView) {
+            spamView.classList.add('hidden');
+        }
+
+        // Change page title
+        document.getElementById('page-title').innerText = 'Inbox';
+
+        // Set selected category
+        const categoryFilter = document.getElementById('category-filter');
+        categoryFilter.value = category;
+
+        // Clear search
+        document.getElementById('email-search').value = '';
+
+        // Apply category filter
+        applyFilters();
         }
 
         // 6. View Switcher (Handles Inbox, HR, Spam)
-        function switchView(view) {
-            const isInbox = view === 'inbox';
-            const isReview = view === 'human-review';
-            const isSpam = view === 'spam';
+        /*function switchView(view) {
 
+            // Switch main page
             document.getElementById('view-inbox').classList.toggle('hidden', !isInbox);
             document.getElementById('view-human-review').classList.toggle('hidden', !isReview);
             
             const spamView = document.getElementById('view-spam');
-            if(spamView) spamView.classList.toggle('hidden', !isSpam);
+            if (spamView) {
+                spamView.classList.toggle('hidden', !isSpam);
+            }
 
-            if (isInbox) document.getElementById('page-title').innerText = 'Inbox';
-            else if (isReview) document.getElementById('page-title').innerText = 'Human Review';
-            else if (isSpam) document.getElementById('page-title').innerText = 'Spam Folder';
-            
+            // Change page title
+            if (isInbox) {
+                document.getElementById('page-title').innerText = 'Inbox';
+            } else if (isReview) {
+                document.getElementById('page-title').innerText = 'Human Review';
+            } else if (isSpam) {
+                document.getElementById('page-title').innerText = 'Spam Folder';
+            }
+
             document.getElementById('email-search').value = '';
+
             const spamSearch = document.getElementById('spam-search');
-            if(spamSearch) spamSearch.value = '';
-            
+            if (spamSearch) {
+                spamSearch.value = '';
+            }
+
             applyFilters();
             applySpamSearch();
+        }*/
+            function switchView(view) {
+
+            const isInbox = view === 'inbox';
+            const isReview = view === 'human-review';
+            const isSpam = view === 'spam';
+
+            // =========================
+            // Switch main page
+            // =========================
+
+            document.getElementById('view-inbox')
+            .classList.toggle('hidden', !isInbox);
+
+            document.getElementById('view-human-review')
+            .classList.toggle('hidden', !isReview);
+
+            const spamView = document.getElementById('view-spam');
+
+            if (spamView) {
+            spamView.classList.toggle('hidden', !isSpam);
+            }
+
+            // =========================
+            // Change page title
+            // =========================
+
+            if (isInbox) {
+            document.getElementById('page-title').innerText = 'Inbox';
+
+            } else if (isReview) {
+            document.getElementById('page-title').innerText = 'Human Review';
+
+            } else if (isSpam) {
+            document.getElementById('page-title').innerText = 'Spam Folder';
+            }
+
+            // =========================
+            // Clear searches
+            // =========================
+
+            const emailSearch = document.getElementById('email-search');
+
+            if (emailSearch) {
+                emailSearch.value = '';
+            }
+
+            const spamSearch = document.getElementById('spam-search');
+
+            if (spamSearch) {
+                spamSearch.value = '';
+            }
+
+            // =========================
+            // Apply current view
+            // =========================
+
+            if (isInbox) {
+                applyFilters();
+            }
+
+            if (isSpam) {
+                applySpamSearch();
+            }
         }
 
         // 7. Friend's Original Sub-Navigation Function (Preserved)
@@ -1159,6 +1100,22 @@
             const target = document.getElementById('hr-sub-' + subPage);
             if (target) target.classList.remove('hidden');
         }
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+
+            const isDarkMode = document.body.classList.contains('dark-mode');
+
+            const toggleCircle = document.getElementById('theme-toggle-circle');
+            const themeLabel = document.getElementById('theme-label');
+
+            if (isDarkMode) {
+                toggleCircle.classList.add('translate-x-7');
+                themeLabel.innerText = 'Dark Mode';
+            } else {
+                toggleCircle.classList.remove('translate-x-7');
+                themeLabel.innerText = 'Light Mode';
+            }
+        }
 
         // Minor Utilities
         function toggleSidebar() {
@@ -1175,5 +1132,6 @@
             updateCategoryCounts();
         };
     </script>
+    <script src="js/components.js"></script>
 </body>
 </html>
