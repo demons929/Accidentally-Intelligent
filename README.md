@@ -1,2 +1,8 @@
 # Accidentally-Intelligent
-This repository is for the purpose of participating in Averis x Monash Hackathon 2026.
+## Team Name and Project Name
+## Problem
+## Technical Architecture
+## Implementation Details
+## What we solved
+## Challenges Faced
+## Future Roadmap
