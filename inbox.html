@@ -1,0 +1,144 @@
+<!-- ===================== 1. INBOX VIEW ===================== -->
+            <div id="view-inbox" class="space-y-4 max-w-7xl mx-auto">
+                <!-- Search & Filters Bar -->
+                <div class="flex flex-wrap gap-3 items-center justify-between bg-white p-3.5 rounded-2xl border gold-border shadow-sm">
+                    <div class="relative flex-1 min-w-[240px]">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gold text-sm"></i>
+                        <input type="text" id="email-search" oninput="applyFilters()" placeholder="Search sender, subject, preview..." 
+                               class="w-full pl-10 pr-4 py-2 bg-ivory-light border gold-border rounded-xl text-sm text-navy font-medium focus:outline-none focus:ring-2 focus:ring-gold/50 transition">
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs font-extrabold gold-text uppercase tracking-wider whitespace-nowrap">
+                            <i class="fa-solid fa-filter mr-1"></i> Category Filter:
+                        </label>
+                        <select id="category-filter" onchange="applyFilters()" 
+                                class="bg-navy text-ivory border gold-border text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-gold/50 cursor-pointer shadow-sm">
+                            <option value="All" id="opt-all">All Categories (0)</option>
+                            <option value="Comparison requests" id="opt-comparison">Comparison requests (0)</option>
+                            <option value="New SI requests" id="opt-si">New SI requests (0)</option>
+                            <option value="Invoice queries" id="opt-invoice">Invoice queries (0)</option>
+                            <option value="General mail" id="opt-general">General mail (0)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                    <div class="bg-navy-surface px-4 py-3 border-b gold-border flex items-center justify-between">
+                        <span class="text-xs font-bold text-gold uppercase tracking-wider">Email Messages</span>
+                        <span id="showing-count" class="text-xs text-ivory/70 font-mono">Showing all emails</span>
+                    </div>
+
+                    <div id="email-list" class="divide-y divide-gold/15">
+                        
+                        <!-- Row 1: Comparison -->
+                        <div class="email-row p-4 transition cursor-pointer flex items-center justify-between group" data-category="Comparison requests">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-navy text-gold font-extrabold flex items-center justify-center shrink-0 border gold-border group-hover:scale-105 transition-transform shadow-sm">M</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate">Maersk Freight Services</h4>
+                                    <!-- Double Badge -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-navy text-gold border gold-border text-[9px] font-extrabold rounded uppercase tracking-wide">Category: Comparison</span>
+                                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Classified</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Q3 Rate Comparison Matrix for Asia-Pacific Routes</p>
+                                    <p class="text-xs text-navy/60 truncate">Please review the valid freight quotes attached for processing.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                    <option value="Spam">Spam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: New SI -->
+                        <div class="email-row p-4 transition cursor-pointer flex items-center justify-between group" data-category="New SI requests">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 font-extrabold flex items-center justify-center shrink-0 border border-amber-300 group-hover:scale-105 transition-transform shadow-sm">C</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate">COSCO Shipping</h4>
+                                    <!-- Double Badge -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Category: New SI</span>
+                                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Classified</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Shipping Instructions - Vessel 908 Voyage #A12</p>
+                                    <p class="text-xs text-navy/60 truncate">Updated container load details for the upcoming port departure.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                    <option value="Spam">Spam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Invoice -->
+                        <div class="email-row p-4 transition cursor-pointer flex items-center justify-between group" data-category="Invoice queries">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-amber-900 text-amber-100 font-extrabold flex items-center justify-center shrink-0 border border-amber-700 group-hover:scale-105 transition-transform shadow-sm">H</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate">Hapag-Lloyd Finance</h4>
+                                    <!-- Double Badge -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-amber-900 text-amber-100 border border-amber-700 text-[9px] font-extrabold rounded uppercase tracking-wide">Category: Invoice</span>
+                                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Classified</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Discrepancy in Terminal Handling Charge Invoice #INV-8821</p>
+                                    <p class="text-xs text-navy/60 truncate">Checking invoice balance against agreed contract rate.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                    <option value="Spam">Spam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 4: General -->
+                        <div class="email-row p-4 transition cursor-pointer flex items-center justify-between group" data-category="General mail">
+                            <div class="flex items-center space-x-4 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-slate-200 text-slate-800 font-extrabold flex items-center justify-center shrink-0 border border-slate-300 group-hover:scale-105 transition-transform shadow-sm">P</div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-sm text-navy truncate">Port Authority Notice</h4>
+                                    <!-- Double Badge -->
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-0.5 bg-slate-200 text-slate-800 border border-slate-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Category: General</span>
+                                        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold rounded uppercase tracking-wide">Status: Classified</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-navy/90 truncate mt-1.5">Scheduled System Maintenance on Sunday</p>
+                                    <p class="text-xs text-navy/60 truncate">Please be aware of temporary portal downtime during off-peak hours.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center ml-4 shrink-0 space-x-2">
+                                <select onchange="changeEmailCategory(this)" class="px-2 py-1.5 bg-navy text-ivory text-[10px] font-bold rounded-lg border gold-border focus:outline-none opacity-0 group-hover:opacity-100 transition cursor-pointer shadow-sm hover:ring-2 hover:ring-gold/50">
+                                    <option value="" disabled selected>Move to...</option>
+                                    <option value="Comparison requests">Comparison</option>
+                                    <option value="New SI requests">New SI</option>
+                                    <option value="Invoice queries">Invoice</option>
+                                    <option value="General mail">General</option>
+                                    <option value="Spam">Spam</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>

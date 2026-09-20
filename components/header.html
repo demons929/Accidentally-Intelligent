@@ -1,0 +1,31 @@
+ <!-- Header -->
+        <header class="h-16 bg-navy text-ivory flex items-center justify-between px-6 border-b gold-border shrink-0 z-10 shadow-md">
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleSidebar()" class="text-ivory/80 hover:text-gold p-2 rounded-lg hover:bg-navy-light/50 transition">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <h1 id="page-title" class="font-extrabold text-lg text-ivory tracking-wide">Inbox</h1>
+                    <span class="hidden md:inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full border gold-border text-gold bg-navy-light">
+                        HarryPort Operations
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+
+                <div class="h-6 w-px bg-gold/20"></div>
+        
+
+                <div onclick="openModal('profile-modal')"
+                    class="flex items-center space-x-3 cursor-pointer p-1.5 rounded-xl hover:bg-navy-light/50 transition border border-transparent hover:border-gold/30">
+                    <div class="w-9 h-9 rounded-xl gold-gradient text-navy-dark flex items-center justify-center font-black text-sm shadow-md border border-ivory/20">
+                        C
+                    </div>
+                    <div class="hidden sm:block text-left">
+                        <p class="text-xs font-bold text-ivory leading-none">Captain</p>
+                        <p class="text-[10px] text-gold font-medium mt-0.5">Port Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </header>

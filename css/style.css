@@ -1,0 +1,147 @@
+
+        :root {
+            --color-navy: #182536;
+            --color-gold: #C6A15B;
+            --color-ivory: #F2E9DA;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F2E9DA;
+            color: #182536;
+        }
+        /* Heading Font */
+        h1,
+        h2,
+        h3,
+        .brand-text,
+        #brand-text {
+            font-family: 'Montserrat', 'Inter', sans-serif;
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #d9b675 0%, #C6A15B 50%, #9e7a35 100%);
+        }
+
+        .gold-border {
+            border-color: rgba(198, 161, 91, 0.35);
+        }
+
+        .gold-border-solid {
+            border-color: #C6A15B;
+        }
+
+        .gold-text {
+            color: #C6A15B;
+        }
+
+        .gold-active-nav {
+            background: linear-gradient(90deg, rgba(198, 161, 91, 0.15) 0%, rgba(198, 161, 91, 0.02) 100%);
+            border-left: 4px solid #C6A15B;
+            color: #C6A15B;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(242, 233, 218, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(198, 161, 91, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(198, 161, 91, 0.7);
+        }
+
+        /* Sidebar Active - Gold */
+        .sidebar-active-gold {
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            border-left: 3px solid #d4af5a;
+            color: #f5f0e6 !important;
+        }
+
+        /* Sidebar Active - Spam */
+        .sidebar-active-red {
+            background: rgba(127, 29, 29, 0.25);
+            box-shadow: 0 6px 18px rgba(127, 29, 29, 0.25);
+            border-left: 3px solid #f43f5e;
+            color: #fb7185 !important;
+        }
+
+        /* ===================== DARK MODE ===================== */
+
+        .dark-mode {
+            background-color: #111827 !important;
+            color: #f3f4f6 !important;
+        }
+
+        /* Main page */
+        .dark-mode main {
+            background-color: #111827 !important;
+        }
+
+        /* White elements */
+        .dark-mode .bg-white {
+            background-color: #1f2937 !important;
+        }
+
+        /* Ivory elements */
+        .dark-mode .bg-ivory {
+            background-color: #273449 !important;
+        }
+
+        /* All navy text */
+        .dark-mode .text-navy,
+        .dark-mode [class*="text-navy/"] {
+            color: #f3f4f6 !important;
+        }
+
+        /* Navy dark text */
+        .dark-mode .text-navy-dark {
+            color: #f3f4f6 !important;
+        }
+
+        /* Gold text */
+        .dark-mode .gold-text {
+            color: #d4af5a !important;
+        }
+
+        /* Borders */
+        .dark-mode .gold-border {
+            border-color: rgba(212, 175, 90, 0.35) !important;
+        }
+
+        .dark-mode .gold-border-solid {
+            border-color: #d4af5a !important;
+        }
+
+        /* Search box */
+        .dark-mode input,
+        .dark-mode select {
+            background-color: #1f2937 !important;
+            color: #f3f4f6 !important;
+            border-color: rgba(212, 175, 90, 0.35) !important;
+        }
+
+        /* Search placeholder */
+        .dark-mode input::placeholder {
+            color: #9ca3af !important;
+        }
+
+        /* Modal */
+        .dark-mode .bg-white.rounded-2xl {
+            background-color: #1f2937 !important;
+        } 
+        /* Email Row Hover - Light Mode */
+        .email-row:hover {
+            background-color: rgba(24, 37, 54, 0.06);
+        }
+
+        /* Email Row Hover - Dark Mode */
+        .dark-mode .email-row:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
