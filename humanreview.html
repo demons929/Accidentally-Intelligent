@@ -1,0 +1,576 @@
+<!-- ===================== 2. HUMAN REVIEW VIEW (FRIEND'S ORIGINAL CODE) ===================== -->
+            <div id="view-human-review" class="hidden space-y-6 max-w-6xl mx-auto">
+
+                <div id="hr-sub-dashboard" class="space-y-6">
+                    <!-- Page Title Header -->
+                    <div>
+                        <h2 class="text-2xl font-black text-navy">Human Review</h2>
+                        <p class="text-xs font-medium text-navy/70 mt-1">Review emails and attachments that require manual action.</p>
+                    </div>
+
+                    <!-- Top 3 Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                    <!-- CARD 1 — UNREADABLE ATTACHMENTS -->
+                    <div class="bg-white rounded-2xl p-6 border-2 gold-border-solid shadow-md flex flex-col justify-between space-y-4 hover:shadow-lg transition">
+
+                        <div class="flex items-start justify-between">
+                            <div class="space-y-1">
+                            <p class="text-sm font-extrabold text-navy">
+                                Unreadable Attachments
+                            </p>
+
+                            <p id="unreadable-count" class="text-4xl font-black text-gold">
+                            1
+                            </p>
+                            </div>
+
+                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-gold border gold-border flex items-center justify-center text-xl shadow-sm">
+                            <i class="fa-solid fa-file-circle-exclamation"></i>
+                            </div>
+                        </div>
+
+                    <p class="text-xs text-navy/70 leading-relaxed">
+                        Attachments that could not be read or processed.
+                    </p>
+
+                <button
+                    onclick="switchReviewSubPage('unreadable-list')"
+                    class="w-full py-2.5 px-4 gold-gradient text-navy-dark font-extrabold text-xs rounded-xl shadow hover:brightness-105 transition flex items-center justify-center space-x-2">
+
+                    <span>Review Unreadable</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+
+                </button>
+
+            </div>
+
+
+                <!-- CARD 2 — PDF FILE CORRUPTED -->
+            <div class="bg-white rounded-2xl p-6 border-2 border-rose-300 shadow-md flex flex-col justify-between space-y-4 hover:shadow-lg transition">
+
+                <div class="flex items-start justify-between">
+                    <div class="space-y-1">
+                        <p class="text-sm font-extrabold text-navy">
+                            PDF File Corrupted
+                        </p>
+
+                        <p id="corrupted-count" class="text-4xl font-black text-rose-600">
+                        2
+                        </p>
+                    </div>
+
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center text-xl shadow-sm">
+                        <i class="fa-solid fa-file-circle-xmark"></i>
+                    </div>
+                </div>
+
+                <p class="text-xs text-navy/70 leading-relaxed">
+                    PDF files that could not be opened, read, or processed correctly.
+                </p>
+
+                <button
+                    onclick="switchReviewSubPage('corrupted-list')"
+                    class="w-full py-2.5 px-4 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
+
+                    <span>Review Corrupted</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+
+                </button>
+
+            </div>
+
+
+                <!-- CARD 3 — RESOLVED -->
+            <div class="bg-white rounded-2xl p-6 border-2 border-emerald-300 shadow-md flex flex-col justify-between space-y-4 hover:shadow-lg transition">
+
+                <div class="flex items-start justify-between">
+                    <div class="space-y-1">
+                    <p class="text-sm font-extrabold text-navy">
+                        Resolved
+                    </p>
+
+                    <p id="resolved-count" class="text-4xl font-black text-emerald-600">
+                        4
+                    </p>
+                </div>
+
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center text-xl shadow-sm">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+
+                <p class="text-xs text-navy/70 leading-relaxed">
+                    Human review cases that have been successfully resolved.
+                </p>
+
+                <button
+                onclick="switchReviewSubPage('resolved-list')"
+                class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center space-x-2">
+
+                <span>View Resolved</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+
+                </button>
+
+                </div>
+
+            </div>
+                    <!-- Additional Summary -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-black text-gold-dark uppercase tracking-wider">Review Summary</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div class="bg-white p-4 rounded-xl border gold-border shadow-sm">
+                                <p class="text-[11px] font-bold text-navy/60">Total Human Review Cases</p>
+                                <p id="total-review-count" class="text-xl font-black text-navy mt-1">7</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border gold-border shadow-sm">
+                                <p class="text-[11px] font-bold text-navy/60">Unreadable Attachments</p>
+                                <p id="summary-unreadable-count" class="text-xl font-black text-gold mt-1">1</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border gold-border shadow-sm">
+                                <p class="text-[11px] font-bold text-navy/60">Corrupted Emails</p>
+                                <p id="summary-corrupted-count" class="text-xl font-black text-rose-600 mt-1">2</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border gold-border shadow-sm">
+                                <p class="text-[11px] font-bold text-navy/60">Resolved Today</p>
+                                <p id="summary-resolved-count" class="text-xl font-black text-emerald-600 mt-1">4</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Human Review Activity -->
+                    <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                        <div class="bg-navy-surface px-5 py-3.5 border-b gold-border">
+                            <h3 class="text-xs font-extrabold text-gold uppercase tracking-wider">Recent Review Activity</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-ivory border-b gold-border text-navy font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Email</th>
+                                        <th class="p-3.5">Issue</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5">Received</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gold/15 text-navy font-medium">
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">Maersk Freight Services</td>
+                                        <td class="p-3.5 text-navy/80">Unreadable PDF attachment</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending</span></td>
+                                        <td class="p-3.5 font-mono text-navy/70">10:42 AM</td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('unreadable-detail')" class="px-3 py-1 gold-gradient text-navy-dark font-extrabold text-[11px] rounded-lg shadow-sm">Review</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">COSCO Shipping</td>
+                                        <td class="p-3.5 text-navy/80">Corrupted email body</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending</span></td>
+                                        <td class="p-3.5 font-mono text-navy/70">Yesterday</td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('corrupted-detail')" class="px-3 py-1 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-[11px] rounded-lg shadow-sm">Review</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">Hapag-Lloyd Finance</td>
+                                        <td class="p-3.5 text-navy/80">Unreadable invoice attachment</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-md font-bold text-[10px]">Resolved</span></td>
+                                        <td class="p-3.5 font-mono text-navy/70">Sep 18</td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('unreadable-detail')" class="px-3 py-1 bg-navy text-gold border gold-border font-extrabold text-[11px] rounded-lg shadow-sm">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hr-sub-unreadable-list" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button
+                                onclick="switchReviewSubPage('dashboard')"
+                                class="inline-flex items-center gap-2 px-3.5 py-2 bg-white border gold-border rounded-lg text-xs font-bold text-navy shadow-sm hover:bg-ivory hover:border-gold hover:text-gold transition">
+                                <i class="fa-solid fa-arrow-left text-[11px]"></i>
+                                <span>Back</span>
+                            </button>
+                            <h2 class="text-xl font-black text-navy">Unreadable Attachments</h2>
+                            <p class="text-xs text-navy/70 mt-0.5">Review documents that could not be read or extracted successfully.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-navy text-gold font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Sender</th>
+                                        <th class="p-3.5">Email Subject</th>
+                                        <th class="p-3.5">Attachment</th>
+                                        <th class="p-3.5">Problem</th>
+                                        <th class="p-3.5">Received</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gold/15 text-navy">
+                                    <tr id="unreadable-case-1" class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">Maersk Freight Services</td>
+                                        <td class="p-3.5 font-semibold text-navy/90">"Q3 Rate Comparison Matrix for Asia-Pacific Routes"</td>
+                                        <td class="p-3.5 font-mono text-xs gold-text font-bold">Rate_Comparison.pdf</td>
+                                        <td class="p-3.5 text-navy/80">PDF content could not be extracted.</td>
+                                        <td class="p-3.5 font-mono text-navy/60">10:42 AM</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending Review</span></td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('unreadable-detail')" class="px-3 py-1.5 gold-gradient text-navy-dark font-extrabold text-xs rounded-lg shadow-sm whitespace-nowrap">Open Review</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hr-sub-unreadable-detail" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button
+                                onclick="switchReviewSubPage('unreadable-list')"
+                                class="inline-flex items-center gap-2 px-3.5 py-2 bg-white border gold-border rounded-lg text-xs font-bold text-navy shadow-sm hover:bg-ivory hover:border-gold hover:text-gold transition">
+                                <i class="fa-solid fa-arrow-left text-[11px]"></i>
+                                <span>Back</span>
+                            </button>
+                            <h2 class="text-xl font-black text-navy">Review Unreadable Attachment</h2>
+                        </div>
+                    </div>
+
+                    <!-- Email Information Summary -->
+                    <div class="bg-white rounded-2xl p-4 border gold-border shadow-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Sender</p>
+                            <p class="font-extrabold text-navy mt-0.5">Maersk Freight Services</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Subject</p>
+                            <p class="font-extrabold text-navy mt-0.5 truncate">Q3 Rate Comparison Matrix</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Attachment</p>
+                            <p class="font-mono font-bold text-gold mt-0.5">Rate_Comparison.pdf</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Issue</p>
+                            <p class="font-semibold text-rose-700 mt-0.5">Unable to extract content</p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Panel -->
+                    <div class="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl flex items-start space-x-3 text-xs">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg mt-0.5"></i>
+                        <div>
+                            <p class="font-extrabold text-amber-950">Document could not be processed</p>
+                            <p class="text-amber-900 mt-0.5">Please manually inspect the original attachment and determine the appropriate action.</p>
+                        </div>
+                    </div>
+
+                    <!-- Split Layout Preview & Controls -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Side 1: Original Email Preview -->
+                        <div class="bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-3">
+                            <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">Original Email Preview</h3>
+                            <div class="p-3 bg-ivory rounded-xl text-xs space-y-2 text-navy/80 font-mono">
+                                <p><strong class="text-navy">From:</strong> rate-desk@maersk-freight.com</p>
+                                <p><strong class="text-navy">Date:</strong> Today, 10:42 AM</p>
+                                <p><strong class="text-navy">Subject:</strong> Q3 Rate Comparison Matrix for Asia-Pacific Routes</p>
+                                <hr class="border-gold/20 my-2">
+                                <p class="text-navy font-sans text-xs">Dear Port Ops,<br><br>Attached is our revised Q3 rate matrix file (<code class="bg-white px-1 font-mono">Rate_Comparison.pdf</code>). Please update the automated pricing comparison database accordingly.</p>
+                            </div>
+                        </div>
+
+                        <!-- Side 2: Problem Information & Action Options -->
+                        <div class="bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-4 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">Attachment & Problem Information</h3>
+                                <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl space-y-2 text-xs">
+                                    <p class="font-bold text-rose-900"><i class="fa-solid fa-bug mr-1"></i> Extraction Error Log</p>
+                                    <p class="text-rose-800 font-mono text-[11px]">ERR_OCR_UNREADABLE_FONT_ENCODING: PDF text stream corrupted or password protected.</p>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="space-y-2 pt-4 border-t gold-border">
+                                <button onclick="resolveHumanReviewCase(1);"
+                                        class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition">
+                                        <i class="fa-solid fa-circle-check mr-1"></i> Mark as Resolved
+                                </button>
+                                <button onclick="requestNewAttachment(1);"
+                                        class="w-full py-2.5 bg-navy hover:bg-navy-light text-gold border gold-border font-extrabold text-xs rounded-xl shadow transition">
+                                    <i class="fa-solid fa-paper-plane mr-1"></i> Request New Attachment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hr-sub-corrupted-list" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button
+                                onclick="switchReviewSubPage('dashboard')"
+                                class="inline-flex items-center gap-2 px-3.5 py-2 bg-white border gold-border rounded-lg text-xs font-bold text-navy shadow-sm hover:bg-ivory hover:border-gold hover:text-gold transition">
+                                <i class="fa-solid fa-arrow-left text-[11px]"></i>
+                                <span>Back</span>
+                            </button>
+                            <h2 class="text-xl font-black text-navy">Corrupted Emails</h2>
+                            <p class="text-xs text-navy/70 mt-0.5">Review emails that could not be processed correctly.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-navy text-rose-300 font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Sender</th>
+                                        <th class="p-3.5">Subject</th>
+                                        <th class="p-3.5">Problem</th>
+                                        <th class="p-3.5">Received</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gold/15 text-navy">
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">COSCO Shipping</td>
+                                        <td class="p-3.5 font-semibold text-navy/90">Shipping Instructions – Vessel 908 Voyage #A12</td>
+                                        <td class="p-3.5 text-rose-700 font-medium">Email content is incomplete or corrupted</td>
+                                        <td class="p-3.5 font-mono text-navy/60">Yesterday</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending Review</span></td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('corrupted-detail')" class="px-3 py-1.5 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-xs rounded-lg shadow-sm whitespace-nowrap">Open Review</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-ivory-light/80 transition">
+                                        <td class="p-3.5 font-bold">Global Marketing Deals</td>
+                                        <td class="p-3.5 font-semibold text-navy/90">Unsolicited commercial offer</td>
+                                        <td class="p-3.5 text-rose-700 font-medium">Malformed email content</td>
+                                        <td class="p-3.5 font-mono text-navy/60">Sep 17</td>
+                                        <td class="p-3.5"><span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">Pending Review</span></td>
+                                        <td class="p-3.5 text-right">
+                                            <button onclick="switchReviewSubPage('corrupted-detail')" class="px-3 py-1.5 bg-rose-700 hover:bg-rose-800 text-white font-extrabold text-xs rounded-lg shadow-sm whitespace-nowrap">Open Review</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hr-sub-corrupted-detail" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button
+                                onclick="switchReviewSubPage('corrupted-list')"
+                                class="inline-flex items-center gap-2 px-3.5 py-2 bg-white border gold-border rounded-lg text-xs font-bold text-navy shadow-sm hover:bg-ivory hover:border-gold hover:text-gold transition">
+                                <i class="fa-solid fa-arrow-left text-[11px]"></i>
+                                <span>Back</span>
+                            </button>
+                            <h2 class="text-xl font-black text-navy">Review Corrupted Email</h2>
+                        </div>
+                    </div>
+                
+
+                    <!-- Header Meta Information -->
+                    <div class="bg-white rounded-2xl p-4 border gold-border shadow-sm grid grid-cols-2 sm:grid-cols-5 gap-4 text-xs">
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Sender</p>
+                            <p class="font-extrabold text-navy mt-0.5">COSCO Shipping</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Subject</p>
+                            <p class="font-extrabold text-navy mt-0.5 truncate">Shipping Instructions</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Received</p>
+                            <p class="font-mono font-bold text-navy mt-0.5">Yesterday</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Email ID</p>
+                            <p class="font-mono font-bold text-gold mt-0.5">MSG-9082-CORRUPT</p>
+                        </div>
+                        <div>
+                            <p class="text-navy/50 font-bold uppercase text-[10px]">Processing Status</p>
+                            <p class="font-bold text-rose-600 mt-0.5">PARSER_FAILED</p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Panel -->
+                    <div class="p-4 bg-rose-50 border-2 border-rose-300 rounded-2xl flex items-start space-x-3 text-xs">
+                        <i class="fa-solid fa-circle-exclamation text-rose-600 text-lg mt-0.5"></i>
+                        <div>
+                            <p class="font-extrabold text-rose-950">Email processing failed</p>
+                            <p class="text-rose-900 mt-0.5"><strong class="font-bold">Reason:</strong> The email content could not be reliably parsed.</p>
+                        </div>
+                    </div>
+
+                    <!-- Available Email Evidence Section -->
+                    <div class="bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-4">
+                        <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">Available Email Evidence</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="space-y-2 p-3 bg-ivory rounded-xl border gold-border">
+                                <p><strong class="text-navy">Sender:</strong> COSCO Shipping Logistics &lt;ops@cosco-shipping.com&gt;</p>
+                                <p><strong class="text-navy">Subject:</strong> Shipping Instructions – Vessel 908 Voyage #A12</p>
+                                <p><strong class="text-navy">Timestamp:</strong> Sep 18, 2026, 14:10 UTC</p>
+                                <p><strong class="text-navy">Attachment Names:</strong> <code class="bg-white px-1 text-gold font-mono">SI_MANIFEST_V908.xml</code></p>
+                            </div>
+
+                            <div class="p-3 bg-rose-50/50 rounded-xl border border-rose-200 font-mono text-[11px] text-navy/80 space-y-1">
+                                <p class="font-extrabold text-rose-900 font-sans text-xs">Partial Email Preview:</p>
+                                <p class="text-navy">"Please find attached shipping instructions for container batch #8812... [TRUNCATED_NULL_BYTES]"</p>
+                                <p class="text-rose-600 font-bold italic mt-2">[MISSING / CORRUPTED DATA DETECTED IN MIME BODY ENCODING]</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-3 pt-2">
+                        <button onclick="resolveHumanReviewCase(2);"
+                            class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition">
+                            <i class="fa-solid fa-circle-check mr-1"></i> Mark as Resolved
+                        </button>
+                        <button onclick="requestResend(2);"
+                            class="flex-1 py-2.5 bg-navy hover:bg-navy-light text-gold border gold-border font-extrabold text-xs rounded-xl shadow transition">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Request Resend
+                        </button>
+                    </div>
+                </div>
+                <!-- ===================== RESOLVED LIST ===================== -->
+                <div id="hr-sub-resolved-list" class="hidden space-y-5">
+
+                    <div class="flex items-center justify-between border-b gold-border pb-3">
+                        <div>
+                            <button
+                                onclick="switchReviewSubPage('dashboard')"
+                                class="inline-flex items-center gap-2 px-3.5 py-2 bg-white border gold-border rounded-lg text-xs font-bold text-navy shadow-sm hover:bg-ivory hover:border-gold hover:text-gold transition">
+                                <i class="fa-solid fa-arrow-left text-[11px]"></i>
+                                <span>Back</span>
+                            </button>
+
+                            <h2 class="text-xl font-black text-navy">
+                                Resolved Cases
+                            </h2>
+
+                            <p class="text-xs text-navy/70 mt-0.5">
+                                View human review cases that have been successfully resolved.
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <div class="bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full text-left text-xs">
+
+                                <thead class="bg-navy text-emerald-300 font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Sender</th>
+                                        <th class="p-3.5">Issue</th>
+                                        <th class="p-3.5">Type</th>
+                                        <th class="p-3.5">Resolved</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody class="divide-y divide-gold/15 text-navy">
+
+                                    <tr class="hover:bg-ivory-light/80 transition">
+
+                                        <td class="p-3.5 font-bold">
+                                            Hapag-Lloyd Finance
+                                        </td>
+
+                                        <td class="p-3.5 text-navy/80">
+                                            Unreadable invoice attachment
+                                        </td>
+
+                                        <td class="p-3.5">
+                                            <span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded-md font-bold text-[10px]">
+                                                Unreadable
+                                            </span>
+                                        </td>
+
+                                        <td class="p-3.5 font-mono text-navy/60">
+                                            Sep 18
+                                        </td>
+
+                                        <td class="p-3.5">
+                                            <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-md font-bold text-[10px]">
+                                                Resolved
+                                            </span>
+                                        </td>
+
+                                        <td class="p-3.5 text-right">
+                                            <button
+                                                onclick="switchReviewSubPage('unreadable-detail')"
+                                                class="px-3 py-1.5 bg-navy text-gold border gold-border font-extrabold text-xs rounded-lg shadow-sm">
+                                                View
+                                            </button>
+                                        </td>
+
+                                    </tr>
+
+
+                                    <tr class="hover:bg-ivory-light/80 transition">
+
+                                        <td class="p-3.5 font-bold">
+                                            COSCO Shipping
+                                        </td>
+
+                                        <td class="p-3.5 text-navy/80">
+                                            Corrupted email body
+                                        </td>
+
+                                        <td class="p-3.5">
+                                            <span class="px-2.5 py-0.5 bg-rose-100 text-rose-800 border border-rose-300 rounded-md font-bold text-[10px]">
+                                                Corrupted
+                                            </span>
+                                        </td>
+
+                                        <td class="p-3.5 font-mono text-navy/60">
+                                            Sep 18
+                                        </td>
+
+                                        <td class="p-3.5">
+                                            <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-md font-bold text-[10px]">
+                                                Resolved
+                                            </span>
+                                        </td>
+
+                                        <td class="p-3.5 text-right">
+                                            <button
+                                                onclick="switchReviewSubPage('corrupted-detail')"
+                                                class="px-3 py-1.5 bg-navy text-gold border gold-border font-extrabold text-xs rounded-lg shadow-sm">
+                                                View
+                                            </button>
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>

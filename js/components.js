@@ -22,6 +22,53 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
         console.error("Error loading sidebar:", error);
     });
+
+    fetch("components/profile.html")
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("profile-container").innerHTML = data;
+        })
+        .catch(error => {
+        console.error("Error loading profile:", error);
+        });
+    
+    fetch("components/logout.html")
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("logout-container").innerHTML = data;
+    })
+    .catch(error => {
+        console.error("Error loading logout:", error);
+    });
+
+    fetch("inbox.html")
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("inbox-container").innerHTML = data;
+
+        // Update category counts after Inbox has loaded
+        updateCategoryCounts();
+    })
+    .catch(error => {
+        console.error("Error loading inbox:", error);
+    });
+
+    fetch("humanreview.html")
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("humanreview-container").innerHTML = data;
+    })
+    .catch(error => {
+        console.error("Error loading human review:", error);
+    });
+
+    fetch("spam.html")
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("spam-container").innerHTML = data;
+        updateCategoryCounts();
+        applySpamSearch();
+    });
 });
 
 function updateSidebarActive(activeId) {
@@ -54,3 +101,22 @@ function updateSidebarActive(activeId) {
             activeItem.classList.add("sidebar-active-gold");
         }
     }
+function openModal(id) {
+    document.getElementById(id).classList.remove('hidden');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+}
+
+function openLogoutModal() {
+    closeModal('profile-modal');
+    openModal('logout-modal');
+}
+function closeLogoutModal() {
+    closeModal('logout-modal');
+    openModal('profile-modal');
+}
+function confirmLogout() {
+    window.location.href = "login.html";
+}

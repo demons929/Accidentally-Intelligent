@@ -6,9 +6,17 @@
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #F2E9DA;
             color: #182536;
+        }
+        /* Heading Font */
+        h1,
+        h2,
+        h3,
+        .brand-text,
+        #brand-text {
+            font-family: 'Montserrat', 'Inter', sans-serif;
         }
 
         .gold-gradient {
@@ -66,74 +74,74 @@
 
         /* ===================== DARK MODE ===================== */
 
-.dark-mode {
-    background-color: #111827 !important;
-    color: #f3f4f6 !important;
-}
+        .dark-mode {
+            background-color: #111827 !important;
+            color: #f3f4f6 !important;
+        }
 
-/* Main page */
-.dark-mode main {
-    background-color: #111827 !important;
-}
+        /* Main page */
+        .dark-mode main {
+            background-color: #111827 !important;
+        }
 
-/* White elements */
-.dark-mode .bg-white {
-    background-color: #1f2937 !important;
-}
+        /* White elements */
+        .dark-mode .bg-white {
+            background-color: #1f2937 !important;
+        }
 
-/* Ivory elements */
-.dark-mode .bg-ivory {
-    background-color: #273449 !important;
-}
+        /* Ivory elements */
+        .dark-mode .bg-ivory {
+            background-color: #273449 !important;
+        }
 
-/* All navy text */
-.dark-mode .text-navy,
-.dark-mode [class*="text-navy/"] {
-    color: #f3f4f6 !important;
-}
+        /* All navy text */
+        .dark-mode .text-navy,
+        .dark-mode [class*="text-navy/"] {
+            color: #f3f4f6 !important;
+        }
 
-/* Navy dark text */
-.dark-mode .text-navy-dark {
-    color: #f3f4f6 !important;
-}
+        /* Navy dark text */
+        .dark-mode .text-navy-dark {
+            color: #f3f4f6 !important;
+        }
 
-/* Gold text */
-.dark-mode .gold-text {
-    color: #d4af5a !important;
-}
+        /* Gold text */
+        .dark-mode .gold-text {
+            color: #d4af5a !important;
+        }
 
-/* Borders */
-.dark-mode .gold-border {
-    border-color: rgba(212, 175, 90, 0.35) !important;
-}
+        /* Borders */
+        .dark-mode .gold-border {
+            border-color: rgba(212, 175, 90, 0.35) !important;
+        }
 
-.dark-mode .gold-border-solid {
-    border-color: #d4af5a !important;
-}
+        .dark-mode .gold-border-solid {
+            border-color: #d4af5a !important;
+        }
 
-/* Search box */
-.dark-mode input,
-.dark-mode select {
-    background-color: #1f2937 !important;
-    color: #f3f4f6 !important;
-    border-color: rgba(212, 175, 90, 0.35) !important;
-}
+        /* Search box */
+        .dark-mode input,
+        .dark-mode select {
+            background-color: #1f2937 !important;
+            color: #f3f4f6 !important;
+            border-color: rgba(212, 175, 90, 0.35) !important;
+        }
 
-/* Search placeholder */
-.dark-mode input::placeholder {
-    color: #9ca3af !important;
-}
+        /* Search placeholder */
+        .dark-mode input::placeholder {
+            color: #9ca3af !important;
+        }
 
-/* Modal */
-.dark-mode .bg-white.rounded-2xl {
-    background-color: #1f2937 !important;
-} 
-/* Email Row Hover - Light Mode */
-.email-row:hover {
-    background-color: rgba(24, 37, 54, 0.06);
-}
+        /* Modal */
+        .dark-mode .bg-white.rounded-2xl {
+            background-color: #1f2937 !important;
+        } 
+        /* Email Row Hover - Light Mode */
+        .email-row:hover {
+            background-color: rgba(24, 37, 54, 0.06);
+        }
 
-/* Email Row Hover - Dark Mode */
-.dark-mode .email-row:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-}
+        /* Email Row Hover - Dark Mode */
+        .dark-mode .email-row:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
