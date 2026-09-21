@@ -292,6 +292,7 @@ function goToInbox() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  mountLayout({ active: "inbox", title: "Inbox", subtitle: "HarryPort Operations" });
   let savedTheme = "light";
   try {
     savedTheme = localStorage.getItem(THEME_KEY) || "light";

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HarryPort | Comparison Requests</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="/static/js/layout.js?v=20260921j"></script>
 <script>
 tailwind.config={theme:{extend:{colors:{
 navy:{DEFAULT:'#182536',dark:'#0f1824',light:'#23344a',surface:'#1c2d42'},
@@ -98,105 +99,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 <body class="h-screen w-screen flex overflow-hidden">
 
 <!-- SIDEBAR -->
-<aside id="sidebar" class="w-64 bg-navy text-ivory flex flex-col justify-between h-full border-r gold-border shrink-0 shadow-xl transition-all duration-300">
-<div>
-<div class="h-16 flex items-center px-4 border-b gold-border bg-navy-dark/40">
-<div class="flex items-center space-x-3 overflow-hidden">
-<img src="/resources/image/logo.png" alt="HarryPort Logo" onerror="this.style.display='none'" class="h-9 w-9 object-contain shrink-0">
-<span id="brand-text" class="font-extrabold text-lg tracking-wide whitespace-nowrap">Harry<span class="gold-text">Port</span></span>
-</div>
-</div>
-
-<nav class="p-3 space-y-1.5">
-<button onclick="goToInbox()" id="nav-inbox" class="w-full flex items-center p-2.5 text-ivory/80 hover:text-ivory hover:bg-navy-light/50 font-semibold rounded-xl transition">
-<i class="fa-solid fa-inbox w-6 text-center gold-text"></i>
-<span class="sidebar-text ml-3 text-sm">Inbox</span>
-</button>
-
-<button onclick="goToHumanReviewPage()" id="nav-review" class="w-full flex items-center p-2.5 text-ivory/80 hover:text-ivory hover:bg-navy-light/50 font-semibold rounded-xl transition">
-<i class="fa-solid fa-triangle-exclamation w-6 text-center gold-text"></i>
-<span class="sidebar-text ml-3 text-sm">Human Review</span>
-<span class="sidebar-text ml-auto gold-gradient text-navy-dark text-xs font-black py-0.5 px-2 rounded-full">0</span>
-</button>
-
-<button onclick="showRequests()" id="nav-comparison" class="w-full flex items-center p-2.5 gold-active-nav font-bold rounded-r-xl transition">
-<i class="fa-solid fa-scale-balanced w-6 text-center gold-text"></i>
-<span class="sidebar-text ml-3 text-sm">Comparison Requests</span>
-</button>
-</nav>
-
-<div class="px-3 py-2 mt-2">
-<div class="flex items-center justify-between px-2 mb-2">
-<p class="sidebar-text text-[11px] font-extrabold gold-text uppercase tracking-widest">Categories</p>
-<span class="sidebar-text text-[10px] text-ivory/50 font-mono">LIVE COUNT</span>
-</div>
-<ul class="space-y-1">
-<li>
-<button onclick="showRequests()" id="category-comparison" class="w-full flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg hover:bg-navy-light/50 transition text-left">
-<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-gold mr-3"></span><span class="sidebar-text text-xs">Comparison requests</span></div>
-<span id="sidebar-count-comparison" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">0</span>
-</button>
-</li>
-<li><button onclick="goToInboxCategory('New SI requests')" class="w-full flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg hover:bg-navy-light/50 transition text-left">
-<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 mr-3"></span><span class="sidebar-text text-xs">New SI requests</span></div>
-<span id="sidebar-count-si" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">0</span>
-</button>
-</li>
-<li><button onclick="goToInboxCategory('Invoice queries')" class="w-full flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg hover:bg-navy-light/50 transition text-left">
-<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-600 mr-3"></span><span class="sidebar-text text-xs">Invoice queries</span></div>
-<span id="sidebar-count-invoice" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">0</span>
-</button>
-</li>
-<li><button onclick="goToInboxCategory('General mail')" class="w-full flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg hover:bg-navy-light/50 transition text-left">
-<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-slate-400 mr-3"></span><span class="sidebar-text text-xs">General mail</span></div>
-<span id="sidebar-count-general" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">0</span>
-</button>
-</li>
-<li><button onclick="goToInboxCategory('Spam')" class="w-full flex items-center justify-between text-sm text-ivory/90 p-2 rounded-lg hover:bg-navy-light/50 transition text-left">
-<div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-3"></span><span class="sidebar-text text-xs">Spam</span></div>
-<span id="sidebar-count-spam" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full">0</span>
-</button>
-</li>
-</ul>
-</div>
-</div>
-
-<div class="p-3 border-t gold-border space-y-1 bg-navy-dark/30">
-<button class="w-full flex items-center p-2 text-ivory/80 hover:text-gold hover:bg-navy-light/50 rounded-lg">
-<i class="fa-solid fa-gear w-6 text-center gold-text"></i><span class="sidebar-text ml-3 text-sm font-semibold">Settings</span>
-</button>
-<button onclick="signOut()" class="w-full flex items-center p-2 text-rose-300 hover:bg-rose-950/40 rounded-lg">
-<i class="fa-solid fa-arrow-right-from-bracket w-6 text-center"></i><span class="sidebar-text ml-3 text-sm font-semibold">Log Out</span>
-</button>
-</div>
-</aside>
+<aside id="hp-sidebar"></aside>
 
 <main class="flex-1 flex flex-col h-full overflow-hidden bg-ivory">
 
 <!-- HEADER -->
-<header class="h-16 bg-navy text-ivory flex items-center justify-between px-6 border-b gold-border shrink-0 shadow-md">
-<div class="flex items-center space-x-4">
-<button onclick="toggleSidebar()" class="text-ivory/80 hover:text-gold p-2 rounded-lg hover:bg-navy-light/50">
-<i class="fa-solid fa-bars text-lg"></i>
-</button>
-<div>
-<h1 id="page-title" class="font-extrabold text-lg tracking-wide">Comparison Requests</h1>
-<span class="text-[10px] text-gold font-semibold">Shipping Instruction / Bill of Lading</span>
-</div>
-</div>
+<header id="hp-topbar" class="h-16 bg-navy text-ivory flex items-center justify-between px-6 border-b gold-border shrink-0 shadow-md"></header>
 
-<div class="flex items-center space-x-4">
-<button class="p-2 text-ivory/80 hover:text-gold"><i class="fa-solid fa-bell text-lg"></i></button>
-<div class="h-6 w-px bg-gold/20"></div>
-<div class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition" onclick="openProfileModal()" title="View profile">
-<div id="cmp-header-avatar" class="w-9 h-9 rounded-xl gold-gradient text-navy-dark flex items-center justify-center font-black">C</div>
-<div class="hidden sm:block">
-<p id="cmp-header-user-name" class="text-xs font-bold">Captain</p>
-<p id="cmp-header-user-role" class="text-[10px] text-gold">Port Administrator</p>
-</div>
-</div>
-</div>
-</header>
+<div id="hp-modals"></div>
 
 <div id="app-scroll" class="flex-1 overflow-y-auto p-6 bg-ivory" style="scroll-padding-top:0;">
 
@@ -1172,6 +1082,7 @@ function goToHumanReviewPage() { window.location.href = '/frontpage.html?view=re
 
 /* ---------------- init ---------------- */
 
+mountLayout({ active: 'comparison', title: 'Comparison Requests', subtitle: 'Shipping Instruction / Bill of Lading' });
 requireSession().then(() => {
   showRequests();
   loadComparisonData();
