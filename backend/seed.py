@@ -67,6 +67,7 @@ def seed_comparison_cases(db: Session, settings: Settings | None = None) -> int:
         .all()
     )
     cases: list[ComparisonCase] = []
+    payloads: list[dict] = []
     for email in emails:
         try:
             attachments = json.loads(email.attachments or "[]")
@@ -80,6 +81,7 @@ def seed_comparison_cases(db: Session, settings: Settings | None = None) -> int:
             base_dir=settings.data_dir,
         )
         payload = result.to_case_dict()
+        payloads.append(payload)
         cases.append(
             ComparisonCase(
                 email_id=payload["email_id"],
@@ -96,6 +98,34 @@ def seed_comparison_cases(db: Session, settings: Settings | None = None) -> int:
             )
         )
     upsert_comparison_cases(db, cases)
+    # Sync review flags onto the emails table so the Human Review queue shows
+    # every case a human must look at, with its exact reason:
+    #   unreadable / wrong_doc_type / missing_attachment / missing_value.
+    for payload in payloads:
+        email = db.query(Email).filter(Email.email_id == payload["email_id"]).one_or_none()
+        if email is None:
+            continue
+        reason = payload["review_reason"]
+        genuine = payload["status"] == "NEEDS_REVIEW" and reason
+        # A "missing attachment" escalation is a genuine edge case only when the
+        # email explicitly asked to compare an SI and a BL (e.g. "Please compare
+        # the SI and draft BL ... attachments dropped"). A routine "please send
+        # the draft BL" follow-up with no docs is not a human-review defect.
+        if genuine and reason == "missing_attachment":
+            text = f"{email.subject or ''} {email.body or ''}".casefold()
+            genuine = "compare" in text and (
+                "si" in text or "draft bl" in text or "bill of lading" in text
+            )
+        if genuine:
+            email.is_human_review = True
+            email.review_type = reason
+            email.status = "Pending"
+        elif email.review_type in {"wrong_doc_type", "missing_attachment", "missing_value"}:
+            # No longer a review case (e.g. after a re-parse) -> drop the flag.
+            email.is_human_review = False
+            email.review_type = None
+            email.status = "Classified"
+    db.commit()
     # Sync: drop any persisted case whose email is no longer a Comparison
     # request (e.g. a retrained pipeline reclassified it). Keeps the table
     # canonical instead of accumulating stale rows across re-seeds.

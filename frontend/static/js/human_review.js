@@ -9,13 +9,25 @@ async function loadHumanReview() {
 }
 
 function reviewTypeLabel(type) {
-  return type === "unreadable" ? "Unreadable Attachment" : "Corrupted Email";
+  switch (type) {
+    case "unreadable": return "Unreadable Attachment";
+    case "wrong_doc_type": return "Wrong Document Type";
+    case "missing_attachment": return "Missing Attachment";
+    case "missing_value": return "Missing Value";
+    case "corrupted": return "Corrupted Email";
+    default: return "Unreadable Attachment";
+  }
 }
 
 function reviewTypeBadge(type) {
-  return type === "unreadable"
-    ? "bg-amber-100 text-amber-900 border border-amber-300"
-    : "bg-rose-100 text-rose-800 border border-rose-300";
+  switch (type) {
+    case "wrong_doc_type": return "bg-purple-100 text-purple-900 border border-purple-300";
+    case "missing_attachment": return "bg-blue-100 text-blue-900 border border-blue-300";
+    case "missing_value": return "bg-orange-100 text-orange-900 border border-orange-300";
+    case "corrupted": return "bg-rose-100 text-rose-800 border border-rose-300";
+    case "unreadable":
+    default: return "bg-amber-100 text-amber-900 border border-amber-300";
+  }
 }
 
 function setHumanReviewFilter() {

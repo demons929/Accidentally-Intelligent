@@ -71,6 +71,7 @@ class EmailClassifier:
                 sender=sender,
                 subject=subject,
                 body=self._raw_body(path),
+                attachments=self._raw_attachments(path),
                 error=str(exc),
             )
         except CorruptedEmailError as exc:
@@ -84,8 +85,23 @@ class EmailClassifier:
                 sender=sender,
                 subject=subject,
                 body=self._raw_body(path),
+                attachments=self._raw_attachments(path),
                 error=str(exc),
             )
+
+    def _raw_attachments(self, path: Path) -> list[str]:
+        """Best-effort attachment list for failed-parse review cases.
+
+        Without this the comparison stage never sees the SI/BL filenames and an
+        unreadable BL PDF gets mislabelled as "missing attachment".
+        """
+        try:
+            import json
+
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            return [str(item) for item in payload.get("attachments", []) or []]
+        except Exception:
+            return []
 
     def _raw_body(self, path: Path) -> str:
         """Best-effort full body for human-review cases whose attachment/body failed."""
