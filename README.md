@@ -200,7 +200,7 @@ sequenceDiagram
 
 * Pages: `/` (login) → `frontpage.html` (Inbox + Human Review) → `Comparison.html` (SI-vs-BL verification)
 
-* Human Review is a single unified table of **all** flagged emails (unreadable + corrupted, pending + resolved) with All / Pending / Resolved filters — no more separate duplicate lists.
+* Human Review is a single unified table of **all** flagged emails (the four edge-case types — unreadable attachment, wrong document type, missing attachment, missing value — plus corrupted email; pending + resolved) with per-type badges.
 
 * Demo login: `captain@harryport.com` / `pure_magic_2026`
 
