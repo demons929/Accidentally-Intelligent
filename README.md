@@ -313,7 +313,7 @@ python "...\sdoc-hackathon-docker\server\score\_cli.py" submission.json --json
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | Scorer started at 0.6453 — SI emails over-routed to Comparison, table attachments unread    | Attachment-kind detection + xlsx/docx extraction + fallback routing for unreadable files                      |
 | PDFs where the label sits on its own line, or label + value share a line                    | Two extraction modes; horizontal-whitespace-only patterns so an empty `SHIPPER:` never swallows the next line |
-| Translated/annotated labels like `Consignee (Non-Negotiable) (收货人)`                         | Whitespace-tolerant pattern that skips parenthesized annotations                                              |
+| Translated/annotated labels like `Consignee (Non-Negotiable) `                              | Whitespace-tolerant pattern that skips parenthesized annotations                                              |
 | 20 review-boundary cases (wrong doc type / missing attachment / unreadable / missing value) | Escalated to `NEEDS_REVIEW` with a `review_reason` — recall 1.0                                               |
 | Browser Back from a detail view jumped to the inbox main page                               | `history.pushState` + `popstate` so Back returns to the previous in-page view                                 |
 | Dark mode toggle did nothing (CSS class mismatch)                                           | Unified on `dark-mode` with `localStorage` persistence                                                        |
