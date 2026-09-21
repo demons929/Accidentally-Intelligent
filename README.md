@@ -208,7 +208,17 @@ sequenceDiagram
 
 ### 3. Quick start
 
-Everything you need to get the dashboard running exactly as we demo it — no extra docs. The seeded database (`harryport.db`) and the data bundle are committed in the repo, so a fresh clone already contains all emails, comparisons, and review cases. Demo login: `captain@harryport.com` / `pure_magic_2026`.
+**Option 0 — Try it live (zero install, fastest)**
+
+Open the deployed app: **https://harryport.onrender.com/** and log in with the demo account below. No clone, no Docker — the hosted version is exactly what we demoed.
+
+Demo login: `captain@harryport.com` / `pure_magic_2026`.
+
+---
+
+To run it yourself locally, pick one:
+
+Everything you need to get the dashboard running exactly as we demo it — no extra docs. The seeded database (`harryport.db`) and the data bundle are committed in the repo, so a fresh clone already contains all emails, comparisons, and review cases.
 
 **Option A — Docker (one command, recommended)**
 
