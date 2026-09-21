@@ -208,17 +208,45 @@ sequenceDiagram
 
 ### 3. Quick start
 
+Everything you need to get the dashboard running exactly as we demo it — no extra docs. The seeded database (`harryport.db`) and the data bundle are committed in the repo, so a fresh clone already contains all emails, comparisons, and review cases. Demo login: `captain@harryport.com` / `pure_magic_2026`.
 
+**Option A — Docker (one command, recommended)**
+
+> Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) only. No Python needed.
 
 ```
-pip install -r requirements.txt   # 1. dependencies
+git clone https://github.com/demons929/Accidentally-Intelligent.git
 
-python run\_pipeline.py            # 2. build submission.json + seed the DB
+cd Accidentally-Intelligent
 
-python run\_server.py              # 3. dashboard at http://localhost:8000
+docker compose up -d
 ```
 
-Optional: `python pipeline/train.py` fine-tunes RoBERTa on `data/train`.
+Open **http://localhost:8000** in your browser. (`docker compose down` stops it; data persists.)
+
+**Option B — plain Python (no Docker)**
+
+> Requires Python 3.11+ and Git.
+
+```
+git clone https://github.com/demons929/Accidentally-Intelligent.git
+
+cd Accidentally-Intelligent
+
+python -m venv .venv
+.\.venv\Scripts\activate        # Windows PowerShell   (macOS/Linux: source .venv/bin/activate)
+
+pip install -r requirements.txt # full (pipeline/training included); or requirements.lite.txt for the dashboard only
+
+python run_server.py            # dashboard at http://localhost:8000
+```
+
+Open **http://localhost:8000** in your browser and log in with the demo account above. If port 8000 is taken: `python run_server.py --port 8001`.
+
+Optional (organizer scoring / retraining):
+
+* `python run_pipeline.py` rebuilds `submission.json` (already generated in the repo).
+* `python pipeline/train.py` fine-tunes RoBERTa on `data/train` (requires full deps; see `python pipeline/train.py --help`).
 
 
 

@@ -1,0 +1,24 @@
+# HarryPort — one-command demo for teammates & judges
+#
+#   docker compose up -d     # start  ->  http://localhost:8000
+#   docker compose down      # stop
+#
+# Demo login: captain@harryport.com / pure_magic_2026
+services:
+  harryport:
+    build: .
+    image: harryport:latest
+    container_name: harryport
+    ports:
+      - "8000:8000"
+    environment:
+      # Store the SQLite DB under /app/data (a directory, so the named volume
+      # can mount cleanly). First start auto-seeds from the resources bundle.
+      - HARRYPORT_DATABASE_URL=sqlite:////app/data/harryport.db
+    volumes:
+      # Persist review/resolve actions across restarts.
+      - harryport_db:/app/data
+    restart: unless-stopped
+
+volumes:
+  harryport_db:

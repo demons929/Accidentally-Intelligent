@@ -1,0 +1,13 @@
+# Lightweight dependency set — enough to run the HarryPort web dashboard.
+# Used by the Docker image to keep it small (~1 GB vs ~3 GB with torch).
+# For ML pipeline / model training inside the container, replace with:
+#   pip install -r requirements.txt
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.6
+SQLAlchemy>=2.0.32
+pydantic>=2.8.0
+pydantic-settings>=2.4.0
+python-multipart>=0.0.9
+pandas>=2.2.2
+beautifulsoup4>=4.12.3
+PyMuPDF>=1.24.9
