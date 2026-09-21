@@ -137,7 +137,13 @@
                 <div class="theme-card bg-white rounded-2xl border gold-border shadow-md overflow-hidden transition-colors duration-300">
                     <div class="bg-navy-surface px-4 py-3 border-b gold-border flex items-center justify-between">
                         <span class="text-xs font-bold text-gold uppercase tracking-wider">Email Messages</span>
-                        <span id="showing-count" class="text-xs text-ivory/70 font-mono">Loading emails...</span>
+                        <div class="flex items-center gap-3">
+                            <span id="spam-selected-bar" class="hidden items-center gap-2 bg-rose-950/60 border border-rose-500/40 rounded-lg px-3 py-1">
+                                <span id="spam-selected-count" class="text-[11px] font-bold text-rose-200">0 selected</span>
+                                <button onclick="deleteSelectedSpam()" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-extrabold rounded-md">Delete selected</button>
+                            </span>
+                            <span id="showing-count" class="text-xs text-ivory/70 font-mono">Loading emails...</span>
+                        </div>
                     </div>
 
                     <div id="email-list" class="divide-y divide-gold/15">
@@ -448,7 +454,7 @@
     </div>
 
     <!-- Profile Modal -->
-    <script src="/static/js/layout.js?v=20260921x"></script>
+    <script src="/static/js/layout.js?v=20260921z"></script>
     <script src="/static/js/app.js?v=20260921f"></script>
     <script src="/static/js/inbox.js?v=20260921f"></script>
     <script src="/static/js/human_review.js?v=20260921f"></script>

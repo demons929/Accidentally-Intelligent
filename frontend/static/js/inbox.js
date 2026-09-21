@@ -29,7 +29,7 @@ function renderInbox(emails, category, total) {
       (email) => `
       <div class="email-row p-4 hover:bg-gold/10 transition cursor-pointer flex items-center justify-between group" data-category="${escapeHtml(email.category)}" onclick="openEmailDetail('${escapeHtml(email.email_id)}')">
         <div class="flex items-center space-x-3 min-w-0">
-          ${email.category === "Spam" ? `<input type="checkbox" class="spam-check accent-rose-600 w-4 h-4 shrink-0" onclick="event.stopPropagation()" data-email-id="${escapeHtml(email.email_id)}">` : ""}
+          ${email.category === "Spam" ? `<input type="checkbox" class="spam-check accent-rose-600 w-4 h-4 shrink-0" onclick="event.stopPropagation(); refreshSpamToolbar()" data-email-id="${escapeHtml(email.email_id)}">` : ""}
           <div class="w-10 h-10 rounded-xl bg-navy text-gold font-extrabold flex items-center justify-center shrink-0 border gold-border group-hover:scale-105 transition-transform shadow-sm">${escapeHtml(initials(email.sender))}</div>
           <div class="min-w-0">
             <div class="flex items-center space-x-2">
@@ -134,4 +134,20 @@ async function deleteSelectedSpam() {
   }
   await loadInbox();
   if (typeof loadSidebarCounts === "function") loadSidebarCounts();
+  refreshSpamToolbar();
+}
+
+function refreshSpamToolbar() {
+  const checked = document.querySelectorAll(".spam-check:checked");
+  const bar = document.getElementById("spam-selected-bar");
+  const cnt = document.getElementById("spam-selected-count");
+  if (!bar) return;
+  if (checked.length > 0) {
+    bar.classList.remove("hidden");
+    bar.classList.add("flex");
+    if (cnt) cnt.innerText = checked.length + " selected";
+  } else {
+    bar.classList.add("hidden");
+    bar.classList.remove("flex");
+  }
 }
