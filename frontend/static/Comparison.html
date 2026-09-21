@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -339,7 +339,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 <i class="fa-solid fa-arrow-left mr-1"></i> Back to Comparison Requests
 </button>
 <div class="flex items-center gap-2 text-[11px] text-navy/50 font-semibold mb-1">
-<span>Comparison requests</span><i class="fa-solid fa-chevron-right text-[8px]"></i><span id="detail-id" class="gold-text">—</span>
+<span>Comparison requests</span><i class="fa-solid fa-chevron-right text-[8px]"></i><span id="detail-id" class="gold-text">鈥?/span>
 </div>
 <h2 class="text-xl font-extrabold">Document Verification</h2>
 <p class="text-xs text-navy/60 mt-1">Field-by-field comparison between the Shipping Instruction and Bill of Lading.</p>
@@ -351,18 +351,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 <button onclick="toggleOriginalEmail()" class="w-full flex items-center justify-between px-5 py-3.5 hover:bg-ivory transition group">
 <span class="text-xs font-black text-gold uppercase tracking-wider flex items-center"><i class="fa-solid fa-envelope-open-text mr-2"></i>Original Email</span>
 <span class="flex items-center gap-2 text-[10px] font-bold text-navy/50">
-<span id="original-email-meta" class="hidden sm:inline">—</span>
+<span id="original-email-meta" class="hidden sm:inline">鈥?/span>
 <i id="original-email-chevron" class="fa-solid fa-chevron-down text-[10px] transition-transform group-hover:text-gold"></i>
 </span>
 </button>
 <div id="original-email-body-wrap" class="hidden border-t gold-border">
 <div class="px-5 py-4 space-y-2 text-xs">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-<div><p class="text-[10px] uppercase tracking-wider font-extrabold text-navy/50">From</p><p id="original-email-from" class="font-bold text-navy mt-0.5 break-all">—</p></div>
-<div><p class="text-[10px] uppercase tracking-wider font-extrabold text-navy/50">Subject</p><p id="original-email-subject" class="font-bold text-navy mt-0.5 break-words">—</p></div>
+<div><p class="text-[10px] uppercase tracking-wider font-extrabold text-navy/50">From</p><p id="original-email-from" class="font-bold text-navy mt-0.5 break-all">鈥?/p></div>
+<div><p class="text-[10px] uppercase tracking-wider font-extrabold text-navy/50">Subject</p><p id="original-email-subject" class="font-bold text-navy mt-0.5 break-words">鈥?/p></div>
 </div>
 <div><p class="text-[10px] uppercase tracking-wider font-extrabold text-navy/50">Message Body</p>
-<div id="original-email-body" class="mt-1.5 p-4 bg-ivory-light border gold-border rounded-xl text-navy/90 leading-relaxed whitespace-pre-wrap max-h-80 overflow-y-auto">—</div>
+<div id="original-email-body" class="mt-1.5 p-4 bg-ivory-light border gold-border rounded-xl text-navy/90 leading-relaxed whitespace-pre-wrap max-h-80 overflow-y-auto">鈥?/div>
 </div>
 </div>
 </div>
@@ -373,21 +373,21 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 <div class="flex items-center gap-3">
 <div id="detail-avatar" class="w-11 h-11 rounded-xl bg-navy text-gold flex items-center justify-center font-black border gold-border">M</div>
 <div>
-<h3 id="detail-sender" class="font-extrabold text-sm">—</h3>
-<p id="detail-subject" class="text-xs text-navy/60 mt-1">—</p>
+<h3 id="detail-sender" class="font-extrabold text-sm">鈥?/h3>
+<p id="detail-subject" class="text-xs text-navy/60 mt-1">鈥?/p>
 </div>
 </div>
 <div class="text-right text-xs">
-<p id="detail-request-id" class="font-bold text-navy">Request ID: —</p>
+<p id="detail-request-id" class="font-bold text-navy">Request ID: 鈥?/p>
 <p class="text-navy/50 mt-1">Comparison Request</p>
 </div>
 </div>
 <div class="mt-4 flex flex-wrap gap-3">
 <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-ivory border gold-border text-xs">
-<i class="fa-solid fa-file-pdf text-rose-600"></i><b id="si-file">—</b>
+<i class="fa-solid fa-file-pdf text-rose-600"></i><b id="si-file">鈥?/b>
 </div>
 <div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-ivory border gold-border text-xs">
-<i class="fa-solid fa-file-pdf text-rose-600"></i><b id="bl-file">—</b>
+<i class="fa-solid fa-file-pdf text-rose-600"></i><b id="bl-file">鈥?/b>
 </div>
 </div>
 </div>
@@ -399,7 +399,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 </div>
 <div>
 <p class="text-[10px] uppercase tracking-widest text-gold font-extrabold">Verification Result</p>
-<h3 id="result-title" class="text-base font-extrabold mt-1">—</h3>
+<h3 id="result-title" class="text-base font-extrabold mt-1">鈥?/h3>
 </div>
 </div>
 </div>
@@ -453,7 +453,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
   <div class="flex items-center gap-2">
     <span class="text-[10px] font-extrabold uppercase tracking-wider text-navy/45">Move to category</span>
     <select id="reclassify-select" onchange="reclassifyEmail(this.value)" class="px-3 py-2 rounded-xl border border-gold/30 bg-white text-[10px] font-extrabold text-navy outline-none focus:border-gold">
-      <option value="">Move to…</option>
+      <option value="">Move to鈥?/option>
       <option value="New SI requests">New SI requests</option>
       <option value="Invoice queries">Invoice queries</option>
       <option value="General mail">General mail</option>
@@ -471,7 +471,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 
 <script>
 /* =====================================================================
-   HarryPort Comparison Requests — API-driven
+   HarryPort Comparison Requests 鈥?API-driven
    All data comes from the FastAPI backend:
      GET  /api/comparison?include_resolved=true
      GET  /api/comparison/stats
@@ -582,7 +582,7 @@ function escapeHtml(value) {
 
 /* ---------------- data mapping ---------------- */
 
-const FIELD_MISSING_VALUES = ['', '—', '-', '--', 'n/a', 'na', 'missing', 'nil', 'none', 'tbd', 'tba', 'tbc', 'unknown'];
+const FIELD_MISSING_VALUES = ['', '鈥?, '-', '--', 'n/a', 'na', 'missing', 'nil', 'none', 'tbd', 'tba', 'tbc', 'unknown'];
 
 function normalizeFieldValue(value) {
   if (value === undefined || value === null) return 'Missing';
@@ -652,7 +652,7 @@ async function loadComparisonData() {
     if (category === 'Spam') setCount('sidebar-count-spam', count);
   });
   const reviewBadge = document.querySelector('#nav-review .sidebar-text.ml-auto');
-  if (reviewBadge) reviewBadge.innerText = (emailStats.human_review.unreadable || 0) + (emailStats.human_review.corrupted || 0);
+  if (reviewBadge) reviewBadge.innerText = emailStats.human_review.pending ?? ((emailStats.human_review.unreadable || 0) + (emailStats.human_review.corrupted || 0));
 
   renderRequests();
   renderHumanReviewQueue();
@@ -730,12 +730,12 @@ function toggleOriginalEmail() {
 function renderOriginalEmail(r) {
   const setText = (id, value) => {
     const node = document.getElementById(id);
-    if (node) node.innerText = value || '—';
+    if (node) node.innerText = value || '鈥?;
   };
   setText('original-email-from', r.sender);
   setText('original-email-subject', r.subject);
   setText('original-email-body', r.body || '(No message body available for this email.)');
-  setText('original-email-meta', `${r.sender || 'Unknown sender'} · ${r.subject || 'No subject'}`);
+  setText('original-email-meta', `${r.sender || 'Unknown sender'} 路 ${r.subject || 'No subject'}`);
 }
 
 function openVerification(id) {
@@ -804,7 +804,7 @@ function renderComparison(r) {
     let a = r.siFields[i] === undefined || r.siFields[i] === null ? 'Missing' : r.siFields[i];
     let b = r.blFields[i] === undefined || r.blFields[i] === null ? 'Missing' : r.blFields[i];
     if (r.editedField === name && r.editedValue) { b = r.editedValue; }
-    const missing = (a === '—' || b === '—' || a === 'Missing' || b === 'Missing');
+    const missing = (a === '鈥? || b === '鈥? || a === 'Missing' || b === 'Missing');
     const same = a === b;
     const isMismatch = !same && !missing;
 
@@ -847,7 +847,7 @@ function renderComparison(r) {
     let a = r.siFields[i] === undefined || r.siFields[i] === null ? 'Missing' : r.siFields[i];
     let b = r.blFields[i] === undefined || r.blFields[i] === null ? 'Missing' : r.blFields[i];
     if (r.editedField === name && r.editedValue) { b = r.editedValue; }
-    const missing = (a === '—' || b === '—' || a === 'Missing' || b === 'Missing');
+    const missing = (a === '鈥? || b === '鈥? || a === 'Missing' || b === 'Missing');
     const same = a === b;
     const isMismatch = !same && !missing;
     const lineClass = missing ? 'review-line' : isMismatch ? 'mismatch-line' : 'match-line';
@@ -924,8 +924,8 @@ function renderRemarks(r) {
             <p class="text-[10px] uppercase tracking-wider font-extrabold text-navy/50">Human Review Remark</p>
             <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-navy/70">
               <span><i class="fa-solid fa-user mr-1 text-gold"></i><span class="font-extrabold text-navy">${r.reviewerName || 'Reviewer'}</span></span>
-              <span><i class="fa-solid fa-id-badge mr-1 text-gold"></i>${r.reviewerAccount || '—'}</span>
-              <span><i class="fa-solid fa-briefcase mr-1 text-gold"></i>${r.reviewerPosition || '—'}</span>
+              <span><i class="fa-solid fa-id-badge mr-1 text-gold"></i>${r.reviewerAccount || '鈥?}</span>
+              <span><i class="fa-solid fa-briefcase mr-1 text-gold"></i>${r.reviewerPosition || '鈥?}</span>
             </div>
           </div>
         </div>
@@ -940,7 +940,7 @@ function renderRemarks(r) {
         </div>
         <div class="flex flex-wrap gap-3 text-xs">
           <span class="font-bold text-navy">${r.editedField}</span>
-          <span class="text-navy/40">→</span>
+          <span class="text-navy/40">鈫?/span>
           <span class="font-extrabold text-amber-800">${r.editedValue}</span>
         </div>
       </div>`;
@@ -1077,7 +1077,7 @@ async function applyUploadedData() {
 
 async function saveManualReview() {
   if (!activeReviewRequest) return;
-  const values = reviewFieldNames.map((_, i) => document.getElementById(`review-field-${i}`).value.trim() || '—');
+  const values = reviewFieldNames.map((_, i) => document.getElementById(`review-field-${i}`).value.trim() || '鈥?);
   const corrected = {};
   reviewFieldNames.forEach((name, i) => { corrected[FIELD_LABEL_TO_KEY[name]] = values[i]; });
   await persistReview(corrected, 'Human Review: BL values were manually corrected and re-checked.');
