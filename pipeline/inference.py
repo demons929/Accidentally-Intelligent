@@ -61,22 +61,28 @@ class EmailClassifier:
             parsed = parse_email_file(path, base_dir=base_dir)
             return self.predict_parsed(parsed)
         except UnreadableAttachmentError as exc:
+            sender, subject = self._raw_email_meta(path)
             return Prediction(
                 email_id=path.stem,
                 category=self._fallback_category(path),
                 confidence=0.0,
                 status="HUMAN_REVIEW",
                 review_reason="Unreadable Attachment",
+                sender=sender,
+                subject=subject,
                 body=self._raw_body(path),
                 error=str(exc),
             )
         except CorruptedEmailError as exc:
+            sender, subject = self._raw_email_meta(path)
             return Prediction(
                 email_id=path.stem,
                 category=self._fallback_category(path),
                 confidence=0.0,
                 status="HUMAN_REVIEW",
                 review_reason="Corrupted Email",
+                sender=sender,
+                subject=subject,
                 body=self._raw_body(path),
                 error=str(exc),
             )
@@ -90,6 +96,22 @@ class EmailClassifier:
             return clean_text(payload.get("body") or "")
         except Exception:
             return ""
+
+    def _raw_email_meta(self, path: Path) -> tuple[str, str]:
+        """Best-effort (sender, subject) for human-review cases whose parse failed.
+
+        Keeps reviewers from seeing "Unknown sender" on emails whose only problem
+        is an unreadable/corrupted attachment.
+        """
+        try:
+            import json
+
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            sender = clean_text(payload.get("from") or payload.get("sender") or "")
+            subject = clean_text(payload.get("subject") or "")
+            return sender, subject
+        except Exception:
+            return "", ""
 
     def _fallback_category(self, path: Path) -> str | None:
         """Best-effort category from the raw record when attachments/body broke.
