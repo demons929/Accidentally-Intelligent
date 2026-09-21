@@ -53,7 +53,7 @@ def list_emails(
     category: str | None = Query(default=None),
     search: str | None = Query(default=None),
     page: int = Query(default=1, ge=1),
-    page_size: int = Query(default=settings.default_page_size, ge=1, le=200),
+    page_size: int = Query(default=settings.default_page_size, ge=1, le=1000),
     db: Session = Depends(get_db),
 ) -> PaginatedEmailsOut:
     query = _email_query(db, category, search)
@@ -128,7 +128,7 @@ def list_inbox_alias(
     category: str | None = Query(default=None),
     search: str | None = Query(default=None),
     page: int = Query(default=1, ge=1),
-    page_size: int = Query(default=settings.default_page_size, ge=1, le=200),
+    page_size: int = Query(default=settings.default_page_size, ge=1, le=1000),
     db: Session = Depends(get_db),
 ) -> PaginatedEmailsOut:
     return list_emails(category=category, search=search, page=page, page_size=page_size, db=db)

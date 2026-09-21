@@ -6,7 +6,7 @@ async function loadInbox() {
   const params = new URLSearchParams();
   if (category && category !== "All") params.set("category", category);
   if (search) params.set("search", search);
-  params.set("page_size", "200");
+  params.set("page_size", "1000");
   const payload = await apiGet(`/api/emails${params.toString() ? `?${params}` : ""}`);
   lastLoadedEmails = payload.items;
   renderInbox(payload.items, category, payload.total);
