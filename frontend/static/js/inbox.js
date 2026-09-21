@@ -48,7 +48,7 @@ function renderInbox(emails, category, total) {
   const showing = document.getElementById("showing-count");
   if (showing) {
     showing.innerText =
-      category === "All" ? `Showing ${emails.length} of ${total} emails` : `Showing ${emails.length} email(s) in "${category}"`;
+      category === "All" ? `Showing ${emails.length} of ${total} emails` : `Showing ${total} email(s) in "${category}"`;
   }
 }
 
