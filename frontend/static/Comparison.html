@@ -236,6 +236,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
       <div class="flex items-center gap-2">
         <label for="result-filter" class="text-[10px] font-extrabold uppercase tracking-wider text-navy/45">Result</label>
         <select id="result-filter" onchange="setResultFilter(this.value)" class="px-3 py-2 rounded-xl border border-gold/30 bg-white text-[10px] font-extrabold text-navy outline-none focus:border-gold">
+          <option value="problems" selected>Issues (Mismatch + Review)</option>
           <option value="all">All</option>
           <option value="match">Match</option>
           <option value="mismatch">Mismatch</option>
@@ -444,10 +445,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 <p class="font-extrabold text-sm" id="resolution-title">Resolution</p>
 <p class="text-xs text-navy/60 mt-1" id="resolution-text">The system found a discrepancy that requires attention.</p>
 </div>
-<div class="flex gap-2" id="resolution-actions">
-<button onclick="goToHumanReview()" class="px-4 py-2.5 rounded-xl bg-navy text-gold border gold-border font-extrabold text-xs hover:bg-navy-light">
-<i class="fa-solid fa-arrow-right mr-2"></i>Go to Human Review
-</button>
+<div class="flex flex-wrap items-center gap-3">
+  <div class="flex items-center gap-2">
+    <span class="text-[10px] font-extrabold uppercase tracking-wider text-navy/45">Move to category</span>
+    <select id="reclassify-select" onchange="reclassifyEmail(this.value)" class="px-3 py-2 rounded-xl border border-gold/30 bg-white text-[10px] font-extrabold text-navy outline-none focus:border-gold">
+      <option value="">Move to…</option>
+      <option value="New SI requests">New SI requests</option>
+      <option value="Invoice queries">Invoice queries</option>
+      <option value="General mail">General mail</option>
+      <option value="Spam">Spam</option>
+    </select>
+  </div>
+  <div class="flex gap-2" id="resolution-actions"></div>
 </div>
 </div>
 
@@ -489,7 +498,7 @@ const TOKEN_KEY = "harryport_token";
 let requests = [];
 let currentRequest = null;
 let progressFilter = 'all';
-let resultFilter = 'all';
+let resultFilter = 'problems';
 
 const statusInfo = {
   completed: { label: 'Completed', icon: 'fa-check' },
@@ -689,7 +698,10 @@ function renderRequests() {
   const filtered = matches.filter((r) => {
     const completed = requestIsCompleted(r);
     const matchesProgress = progressFilter === 'all' || (progressFilter === 'completed' ? completed : !completed);
-    const matchesResult = resultFilter === 'all' || r.result === resultFilter;
+    const matchesResult =
+      resultFilter === 'all' ? true
+      : resultFilter === 'problems' ? r.result !== 'match'
+      : r.result === resultFilter;
     return matchesProgress && matchesResult;
   });
 
@@ -751,6 +763,9 @@ function openVerification(id) {
   renderComparison(currentRequest);
   renderRemarks(currentRequest);
   renderOriginalEmail(currentRequest);
+
+  const reclassifySel = document.getElementById('reclassify-select');
+  if (reclassifySel) reclassifySel.value = '';
 
   const actions = document.getElementById('resolution-actions');
   if (currentRequest.result === 'match' || effectiveStatus === 'completed') {
@@ -1113,6 +1128,21 @@ function toggleSidebar() {
 
 function goToHumanReview() {
   if (currentRequest) showHumanReview(currentRequest.id);
+}
+
+async function reclassifyEmail(category) {
+  if (!currentRequest || !category) return;
+  try {
+    await apiPost(`/api/emails/${encodeURIComponent(currentRequest.id)}/move`, { category });
+    // Reload so the sidebar counts and list reflect the move, then return to the list.
+    await loadComparisonData();
+    showRequests();
+  } catch (err) {
+    alert('Failed to move email: ' + (err.message || err));
+  } finally {
+    const sel = document.getElementById('reclassify-select');
+    if (sel) sel.value = '';
+  }
 }
 
 function goToInbox() { window.location.href = '/frontpage.html'; }
