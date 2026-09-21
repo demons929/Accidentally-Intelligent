@@ -616,8 +616,8 @@ function mapCaseToRequest(c) {
     reviewed: c.is_resolved,
     modified: c.is_resolved,
     avatar: initials(c.sender),
-    si: (c.si_file || 'Shipping_Instruction.pdf').split('/').pop(),
-    bl: (c.bl_file || 'Bill_of_Lading.pdf').split('/').pop(),
+    si: c.si_file ? c.si_file.split('/').pop() : '',
+    bl: c.bl_file ? c.bl_file.split('/').pop() : '',
     siFields,
     blFields,
     body: c.body || '',
@@ -754,8 +754,8 @@ function openVerification(id) {
   document.getElementById('detail-sender').innerText = currentRequest.sender;
   document.getElementById('detail-subject').innerText = currentRequest.subject;
   document.getElementById('detail-avatar').innerText = currentRequest.avatar;
-  document.getElementById('si-file').innerText = currentRequest.si;
-  document.getElementById('bl-file').innerText = currentRequest.bl;
+  document.getElementById('si-file').innerText = currentRequest.si || '—';
+  document.getElementById('bl-file').innerText = currentRequest.bl || '—';
 
   const info = statusInfo[currentRequest.result === 'match' ? 'match' : effectiveStatus];
   document.getElementById('detail-status').innerHTML = `<span class="status result-status ${currentRequest.result === 'match' ? 'match' : effectiveStatus}"><i class="fa-solid ${info.icon}"></i>${info.label}</span>`;
@@ -798,6 +798,13 @@ function openVerification(id) {
 }
 
 function renderComparison(r) {
+  if (!r.siFields || r.siFields.length === 0) {
+    document.getElementById('comparison-table').innerHTML =
+      '<div class="p-12 text-center text-xs text-navy/50 leading-relaxed">No SI / BL documents attached.<br/>This is a follow-up message in the comparison thread (e.g. requesting or confirming a draft BL).</div>';
+    document.getElementById('verification-summary').innerHTML =
+      '<div class="comparison-result-card bg-white rounded-2xl border gold-border p-5 shadow-sm"><div class="p-6 text-center text-sm font-bold text-navy/70">No documents to compare</div></div>';
+    return;
+  }
   const names = reviewFieldNames;
   let mismatchCount = 0, reviewCount = 0, matchCount = 0, matchedRowIndex = 0;
   const rows = names.map((name, i) => {
