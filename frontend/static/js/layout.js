@@ -151,6 +151,8 @@
 
   /* ---------- mount ---------- */
   window.mountLayout = function ({ active = "inbox", title = "Inbox", subtitle } = {}) {
+    const map = { inbox: "nav-inbox", review: "nav-review", comparison: "nav-comparison" };
+    active = map[active] || active;
     const sb = document.getElementById("hp-sidebar");
     if (sb) { sb.innerHTML = sidebarHtml(active); sb.id = "sidebar"; sb.className = "w-64 bg-navy text-ivory flex flex-col justify-between h-full border-r gold-border shrink-0 relative z-20 shadow-xl transition-all duration-300"; }
     const tb = document.getElementById("hp-topbar");
