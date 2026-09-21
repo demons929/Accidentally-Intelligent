@@ -143,12 +143,12 @@
           <h3 class="font-extrabold text-navy text-base"><i class="fa-solid fa-gear gold-text mr-2"></i>Settings</h3>
           <button onclick="closeModal('settings-modal')" class="text-navy/50 hover:text-gold"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
-        <div>
-          <p class="text-sm font-bold text-navy mb-2">Dark Mode</p>
-          <button id="hp-theme-switch" onclick="toggleTheme(); syncThemeSwitch()" class="relative w-32 h-12 rounded-full bg-white border gold-border shadow transition-colors duration-300 flex items-center px-1.5" aria-label="Toggle dark mode">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-bold text-navy">Dark Mode</span>
+          <button id="hp-theme-switch" onclick="toggleTheme(); syncThemeSwitch()" class="relative w-28 h-10 rounded-full bg-white border gold-border shadow transition-colors duration-300 flex items-center px-1.5" aria-label="Toggle dark mode">
             <span id="hp-theme-label" class="text-xs font-extrabold text-navy/40 ml-1 select-none">OFF</span>
-            <span id="hp-theme-knob" class="absolute right-1.5 w-9 h-9 rounded-full gold-gradient shadow flex items-center justify-center transition-all duration-300">
-              <i class="fa-solid fa-moon text-navy-dark text-sm"></i>
+            <span id="hp-theme-knob" class="absolute right-1 w-8 h-8 rounded-full gold-gradient shadow flex items-center justify-center transition-all duration-300">
+              <i class="fa-solid fa-moon text-navy-dark text-xs"></i>
             </span>
           </button>
         </div>
@@ -177,12 +177,12 @@
   if (dark) {
     sw.classList.remove("bg-white"); sw.classList.add("bg-slate-800");
     label.innerText = "ON"; label.classList.remove("text-navy/40"); label.classList.add("text-white/70");
-    knob.style.right = "auto"; knob.style.left = "calc(100% - 2.75rem)";
+    knob.style.right = "auto"; knob.style.left = "calc(100% - 2.25rem)";
     knob.innerHTML = '<i class="fa-solid fa-moon text-navy-dark text-sm"></i>';
   } else {
     sw.classList.add("bg-white"); sw.classList.remove("bg-slate-800");
     label.innerText = "OFF"; label.classList.add("text-navy/40"); label.classList.remove("text-white/70");
-    knob.style.right = "0.375rem"; knob.style.left = "auto";
+    knob.style.right = "0.25rem"; knob.style.left = "auto";
     knob.innerHTML = '<i class="fa-solid fa-sun text-navy-dark text-sm"></i>';
   }
 };
