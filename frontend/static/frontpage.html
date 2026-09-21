@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarryPort | Operations Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            DEFAULT: '#182536',
+                            dark: '#0f1824',
+                            light: '#23344a',
+                            surface: '#1c2d42'
+                        },
+                        gold: {
+                            DEFAULT: '#C6A15B',
+                            light: '#d9b675',
+                            dark: '#a8833e',
+                            muted: '#e6cf9c'
+                        },
+                        ivory: {
+                            DEFAULT: '#F2E9DA',
+                            light: '#faf6ee',
+                            card: '#f9f4ec',
+                            dark: '#e3d6be'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+        :root {
+            --color-navy: #182536;
+            --color-gold: #C6A15B;
+            --color-ivory: #F2E9DA;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F2E9DA;
+            color: #182536;
+        }
+
+        body.dark-mode {
+            background-color: #0f1824;
+            color: #F2E9DA;
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #d9b675 0%, #C6A15B 50%, #9e7a35 100%);
+        }
+
+        .gold-border {
+            border-color: rgba(198, 161, 91, 0.35);
+        }
+
+        .gold-border-solid {
+            border-color: #C6A15B;
+        }
+
+        .gold-text {
+            color: #C6A15B;
+        }
+
+        .gold-active-nav {
+            background: linear-gradient(90deg, rgba(198, 161, 91, 0.15) 0%, rgba(198, 161, 91, 0.02) 100%);
+            border-left: 4px solid #C6A15B;
+            color: #C6A15B;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(242, 233, 218, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(198, 161, 91, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(198, 161, 91, 0.7);
+        }
+    </style>
+</head>
+<body id="app-body" class="h-screen w-screen flex overflow-hidden bg-ivory text-navy transition-colors duration-300">
+
+    <aside id="sidebar" class="w-64 bg-navy text-ivory flex flex-col justify-between h-full border-r gold-border shrink-0 relative z-20 shadow-xl transition-all duration-300">
+        <div>
+            <!-- Logo Section -->
+            <div class="h-16 flex items-center px-4 border-b gold-border justify-between bg-navy-dark/40">
+                <div class="flex items-center space-x-3 overflow-hidden">
+                    <img src="/resources/image/logo.png" alt="HarryPort Logo"
+                         onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2942/2942544.png';"
+                         class="h-9 w-9 object-contain shrink-0 filter drop-shadow-md">
+                    <span id="brand-text" class="font-extrabold text-lg text-ivory tracking-wide whitespace-nowrap">
+                        Harry<span class="gold-text">Port</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-3 space-y-1.5">
+                <button onclick="switchView('inbox')" id="nav-inbox" class="w-full flex items-center p-2.5 gold-active-nav font-bold rounded-r-xl transition">
+                    <i class="fa-solid fa-inbox w-6 text-center gold-text"></i>
+                    <span class="sidebar-text ml-3 text-sm whitespace-nowrap">Inbox</span>
+                </button>
+                <button onclick="switchReviewSubPage('dashboard')" id="nav-review" class="w-full flex items-center p-2.5 text-ivory/80 hover:text-ivory hover:bg-navy-light/50 font-semibold rounded-xl transition">
+                    <i class="fa-solid fa-triangle-exclamation w-6 text-center gold-text"></i>
+                    <span class="sidebar-text ml-3 text-sm whitespace-nowrap">Human Review</span>
+                    <span id="review-badge" class="sidebar-text ml-auto gold-gradient text-navy-dark text-xs font-black py-0.5 px-2 rounded-full shadow-sm">0</span>
+                </button>
+                <button onclick="goToComparison()" id="nav-comparison" class="w-full flex items-center p-2.5 text-ivory/80 hover:text-ivory hover:bg-navy-light/50 font-semibold rounded-xl transition">
+                    <i class="fa-solid fa-scale-balanced w-6 text-center gold-text"></i>
+                    <span class="sidebar-text ml-3 text-sm whitespace-nowrap">Comparison Requests</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square sidebar-text ml-auto text-[10px] text-gold/70"></i>
+                </button>
+            </nav>
+
+            <!-- Categories Section -->
+            <div class="px-3 py-2 mt-2">
+                <div class="flex items-center justify-between px-2 mb-2">
+                    <p class="sidebar-text text-[11px] font-extrabold gold-text uppercase tracking-widest">Categories</p>
+                </div>
+                <ul class="space-y-1">
+                    <li onclick="filterByCategory('Comparison requests')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-gold shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Comparison requests</span>
+                        </div>
+                        <span id="sidebar-count-comparison" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                    <li onclick="filterByCategory('New SI requests')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">New SI requests</span>
+                        </div>
+                        <span id="sidebar-count-si" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                    <li onclick="filterByCategory('Invoice queries')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Invoice queries</span>
+                        </div>
+                        <span id="sidebar-count-invoice" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                    <li onclick="filterByCategory('General mail')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">General mail</span>
+                        </div>
+                        <span id="sidebar-count-general" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                    <li onclick="filterByCategory('Spam')" class="flex items-center justify-between text-sm text-ivory/90 p-2 hover:bg-navy-light/60 hover:text-gold rounded-lg cursor-pointer transition group">
+                        <div class="flex items-center min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 mr-3 shadow-sm group-hover:scale-110 transition-transform"></span>
+                            <span class="sidebar-text font-medium text-xs whitespace-nowrap truncate">Spam</span>
+                        </div>
+                        <span id="sidebar-count-spam" class="sidebar-text text-xs font-bold bg-navy-light border gold-border text-gold px-2 py-0.5 rounded-full min-w-[22px] text-center">0</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer / Settings -->
+        <div class="p-3 border-t gold-border space-y-1 bg-navy-dark/30">
+            <button onclick="openModal('settings-modal')" class="w-full flex items-center p-2 text-ivory/80 hover:text-gold hover:bg-navy-light/50 rounded-lg transition">
+                <i class="fa-solid fa-gear w-6 text-center gold-text"></i>
+                <span class="sidebar-text ml-3 text-sm font-semibold whitespace-nowrap">Settings</span>
+            </button>
+            <button onclick="openModal('logout-modal')" class="w-full flex items-center p-2 text-rose-300 hover:text-rose-200 hover:bg-rose-950/40 rounded-lg transition">
+                <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center"></i>
+                <span class="sidebar-text ml-3 text-sm font-semibold whitespace-nowrap">Log Out</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden transition-colors duration-300">
+
+        <!-- Header -->
+        <header class="h-16 bg-navy text-ivory flex items-center justify-between px-6 border-b gold-border shrink-0 z-10 shadow-md">
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleSidebar()" class="text-ivory/80 hover:text-gold p-2 rounded-lg hover:bg-navy-light/50 transition">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <h1 id="page-title" class="font-extrabold text-lg text-ivory tracking-wide">Inbox</h1>
+                    <span class="hidden md:inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full border gold-border text-gold bg-navy-light">
+                        HarryPort Operations
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div onclick="openProfileModal()" class="flex items-center space-x-3 cursor-pointer p-1.5 rounded-xl hover:bg-navy-light/50 transition border border-transparent hover:border-gold/30">
+                    <div id="header-avatar" class="w-9 h-9 rounded-xl gold-gradient text-navy-dark flex items-center justify-center font-black text-sm shadow-md border border-ivory/20">
+                        C
+                    </div>
+                    <div class="hidden sm:block text-left">
+                        <p id="header-user-name" class="text-xs font-bold text-ivory leading-none">Captain</p>
+                        <p id="header-user-role" class="text-[10px] text-gold font-medium mt-0.5">Port Administrator</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div id="content-container" class="flex-1 overflow-y-auto p-6 bg-ivory transition-colors duration-300">
+
+            <!-- 1. INBOX VIEW -->
+            <div id="view-inbox" class="space-y-4 max-w-7xl mx-auto">
+                <div class="theme-card flex flex-wrap gap-3 items-center justify-between bg-white p-3.5 rounded-2xl border gold-border shadow-sm transition-colors duration-300">
+                    <div class="relative flex-1 min-w-[240px]">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gold text-sm"></i>
+                        <input type="text" id="email-search" onkeyup="searchEmails()" placeholder="Search sender, subject, preview..."
+                               class="theme-input w-full pl-10 pr-4 py-2 bg-ivory-light border gold-border rounded-xl text-sm text-navy font-medium focus:outline-none focus:ring-2 focus:ring-gold/50 transition">
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs font-extrabold gold-text uppercase tracking-wider whitespace-nowrap">
+                            <i class="fa-solid fa-filter mr-1"></i> Category Filter:
+                        </label>
+                        <select id="category-filter" onchange="filterByCategory(this.value)"
+                                class="bg-navy text-ivory border gold-border text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-gold/50 cursor-pointer shadow-sm">
+                            <option value="All" id="opt-all">All Categories (0)</option>
+                            <option value="Comparison requests" id="opt-comparison">Comparison requests (0)</option>
+                            <option value="New SI requests" id="opt-si">New SI requests (0)</option>
+                            <option value="Invoice queries" id="opt-invoice">Invoice queries (0)</option>
+                            <option value="General mail" id="opt-general">General mail (0)</option>
+                            <option value="Spam" id="opt-spam">Spam (0)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="theme-card bg-white rounded-2xl border gold-border shadow-md overflow-hidden transition-colors duration-300">
+                    <div class="bg-navy-surface px-4 py-3 border-b gold-border flex items-center justify-between">
+                        <span class="text-xs font-bold text-gold uppercase tracking-wider">Email Messages</span>
+                        <span id="showing-count" class="text-xs text-ivory/70 font-mono">Loading emails...</span>
+                    </div>
+
+                    <div id="email-list" class="divide-y divide-gold/15">
+                        <div class="p-10 text-center text-xs text-navy/50">Loading emails from the classifier...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. HUMAN REVIEW MAIN VIEW -->
+            <div id="view-human-review" class="hidden space-y-6 max-w-6xl mx-auto">
+
+                <!-- ALL HUMAN REVIEW CASES (unified: pending + resolved) -->
+                <div id="hr-sub-dashboard" class="space-y-5">
+                    <div class="flex items-start justify-between gap-3 flex-wrap">
+                        <div>
+                            <h2 class="theme-text-main text-2xl font-black text-navy">Human Review</h2>
+                            <p class="theme-text-sub text-xs font-medium text-navy/70 mt-1">All emails flagged for manual review — pending and resolved.</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold shadow-sm">
+                                <span id="hr-chip-pending" class="font-black">0</span> Pending
+                            </span>
+                            <span class="px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold shadow-sm">
+                                <span id="hr-chip-resolved" class="font-black">0</span> Resolved
+                            </span>
+                        </div>
+                    </div>
+
+
+                    <div class="theme-card bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                        <div class="bg-navy-surface px-4 py-3 border-b gold-border flex items-center justify-between">
+                            <span class="text-xs font-bold text-gold uppercase tracking-wider">Human Review Cases</span>
+                            <span id="hr-showing-count" class="text-xs text-ivory/70 font-mono">Loading...</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-navy text-gold font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Sender</th>
+                                        <th class="p-3.5">Subject</th>
+                                        <th class="p-3.5">Type</th>
+                                        <th class="p-3.5">Email ID</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hr-all-tbody" class="theme-text-main divide-y divide-gold/15 text-navy"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- REVIEWED FILES (resolved only) -->
+                    <div class="theme-card bg-white rounded-2xl border gold-border shadow-md overflow-hidden">
+                        <div class="bg-emerald-700 px-4 py-3 border-b gold-border flex items-center justify-between">
+                            <span class="text-xs font-bold text-ivory uppercase tracking-wider flex items-center"><i class="fa-solid fa-circle-check mr-2"></i>Reviewed Files</span>
+                            <span id="hr-reviewed-count" class="text-xs text-ivory/80 font-mono">0 reviewed</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-navy text-gold font-bold uppercase tracking-wider text-[10px]">
+                                    <tr>
+                                        <th class="p-3.5">Sender</th>
+                                        <th class="p-3.5">Subject</th>
+                                        <th class="p-3.5">Type</th>
+                                        <th class="p-3.5">Email ID</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hr-reviewed-tbody" class="theme-text-main divide-y divide-gold/15 text-navy"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UNREADABLE DETAIL -->
+                <div id="hr-sub-unreadable-detail" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-2">
+                        <button onclick="switchReviewSubPage('dashboard')" class="px-3 py-1.5 bg-navy text-gold border gold-border rounded-lg text-xs font-bold hover:bg-navy-light transition inline-flex items-center">
+                            <i class="fa-solid fa-arrow-left mr-1.5"></i> Back
+                        </button>
+                        <h2 class="theme-text-main text-xl font-black text-navy">Review Unreadable Attachment</h2>
+                    </div>
+
+                    <!-- Top Summary Bar -->
+                    <div class="theme-card bg-white rounded-2xl p-4 border gold-border shadow-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div>
+                            <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">SENDER</p>
+                            <p id="detail-sender" class="theme-text-main font-extrabold text-navy mt-0.5">—</p>
+                        </div>
+                        <div>
+                            <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">SUBJECT</p>
+                            <p id="detail-subject" class="theme-text-main font-extrabold text-navy mt-0.5 truncate">—</p>
+                        </div>
+                        <div>
+                            <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">ATTACHMENT</p>
+                            <p id="detail-attachment" class="font-mono font-bold text-amber-500 mt-0.5">—</p>
+                        </div>
+                        <div>
+                            <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">ISSUE</p>
+                            <p id="detail-issue" class="font-semibold text-rose-500 mt-0.5">—</p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Banner -->
+                    <div class="p-4 bg-amber-950/30 border border-amber-500/40 rounded-2xl flex items-center space-x-3 text-xs">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>
+                        <div>
+                            <p class="font-extrabold text-amber-300">Document could not be processed</p>
+                            <p class="text-amber-200/80 mt-0.5">Please manually inspect the original attachment and determine the appropriate action.</p>
+                        </div>
+                    </div>
+
+                    <!-- Grid Preview and Controls -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <!-- Left Panel: Original Email Preview -->
+                        <div class="theme-card bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-3">
+                            <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">ORIGINAL EMAIL PREVIEW</h3>
+                            <div class="theme-input p-4 bg-ivory-light border gold-border rounded-xl text-xs space-y-3 font-mono">
+                                <p class="theme-text-main text-navy"><strong class="gold-text">Email ID:</strong> <span id="detail-email-id">—</span></p>
+                                <p class="theme-text-main text-navy"><strong class="gold-text">Received:</strong> <span id="detail-received">—</span></p>
+                                <hr class="border-gold/30 my-2">
+                                <div class="theme-text-main font-sans text-xs text-navy leading-relaxed space-y-2">
+                                    <p>The pipeline could not extract text from the attached document (OCR failed, font encoding issue, or the file is password protected).</p>
+                                    <div id="detail-body" class="mt-2 p-3 bg-white/60 border gold-border rounded-lg whitespace-pre-wrap max-h-56 overflow-y-auto hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Error Log, Request, Remarks & Confirm -->
+                        <div class="theme-card bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-4 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">ATTACHMENT &amp; PROBLEM INFORMATION</h3>
+
+                                <div class="p-4 bg-rose-950/40 border border-rose-500/40 rounded-xl space-y-1.5 text-xs">
+                                    <p class="font-bold text-rose-300 flex items-center">
+                                        <i class="fa-solid fa-bug mr-2"></i> Extraction Error Log
+                                    </p>
+                                    <p id="detail-error-log" class="text-rose-200/80 font-mono text-[11px] leading-relaxed">
+                                        ERR_OCR_UNREADABLE: PDF text stream corrupted, password protected, or unsupported encoding.
+                                    </p>
+                                </div>
+
+                                <div class="space-y-1 pt-2">
+                                    <label class="theme-text-main text-xs font-bold text-navy flex items-center">
+                                        <i class="fa-solid fa-comment-dots mr-1.5 gold-text"></i> Review Remarks:
+                                    </label>
+                                    <textarea id="review-remarks-unreadable" oninput="checkConfirmStatus('unreadable')" placeholder="Type your inspection remarks here to enable confirmation..."
+                                              class="theme-input w-full h-20 p-2.5 bg-ivory border gold-border rounded-xl text-xs text-navy focus:outline-none focus:ring-2 focus:ring-gold/50 transition"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2 pt-2">
+                                <button onclick="triggerRequestNewAttachment('unreadable')" class="w-full py-2.5 bg-navy hover:bg-navy-light text-gold border gold-border font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center">
+                                    <i class="fa-solid fa-paper-plane mr-2"></i> Request New Attachment
+                                </button>
+
+                                <button id="btn-confirm-unreadable" disabled onclick="handleConfirm('unreadable')" class="w-full py-2.5 bg-gray-400 text-white font-extrabold text-xs rounded-xl cursor-not-allowed transition flex items-center justify-center">
+                                    <i class="fa-solid fa-check-circle mr-2"></i> Confirm Review
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- CORRUPTED DETAIL -->
+                <div id="hr-sub-corrupted-detail" class="hidden space-y-5">
+                    <div class="flex items-center justify-between border-b gold-border pb-2">
+                        <button onclick="switchReviewSubPage('dashboard')" class="px-3 py-1.5 bg-navy text-gold border gold-border rounded-lg text-xs font-bold hover:bg-navy-light transition inline-flex items-center">
+                            <i class="fa-solid fa-arrow-left mr-1.5"></i> Back
+                        </button>
+                        <h2 class="theme-text-main text-xl font-black text-navy">Review Corrupted Email</h2>
+                    </div>
+
+                    <!-- Top Summary Bar -->
+                    <div class="theme-card bg-white rounded-2xl p-4 border gold-border shadow-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        <div>
+                            <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">SENDER</p>
+                            <p id="detail-sender-c" class="theme-text-main font-extrabold text-navy mt-0.5">—</p>
+                        </div>
+                        <div>
+                            <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">SUBJECT</p>
+                            <p id="detail-subject-c" class="theme-text-main font-extrabold text-navy mt-0.5 truncate">—</p>
+                        </div>
+                        <div>
+                            <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">EMAIL ID</p>
+                            <p id="detail-email-id-c" class="theme-text-main font-mono font-bold text-navy mt-0.5">—</p>
+                        </div>
+                        <div>
+                            <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">STATUS</p>
+                            <p id="detail-status-badge" class="font-bold text-rose-500 mt-0.5">PARSER_FAILED</p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Banner -->
+                    <div class="p-4 bg-rose-950/30 border border-rose-500/40 rounded-2xl flex items-center space-x-3 text-xs">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-400 text-lg"></i>
+                        <div>
+                            <p class="font-extrabold text-rose-300">Corrupted Email Detected</p>
+                            <p class="text-rose-200/80 mt-0.5">Please manually inspect the original email source and request a re-transmission or record inspection notes.</p>
+                        </div>
+                    </div>
+
+                    <!-- Grid Preview and Controls -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <!-- Left Panel: Original Email Preview -->
+                        <div class="theme-card bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-3">
+                            <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">ORIGINAL EMAIL PREVIEW</h3>
+                            <div class="theme-input p-4 bg-ivory-light border gold-border rounded-xl text-xs space-y-3 font-mono">
+                                <p class="theme-text-main text-navy"><strong class="gold-text">Received:</strong> <span id="detail-received-c">—</span></p>
+                                <hr class="border-gold/30 my-2">
+                                <div class="theme-text-main font-sans text-xs text-navy leading-relaxed space-y-2">
+                                    <p>The email body could not be parsed (MIME parsing failed, null bytes, or the payload was empty).</p>
+                                    <div id="detail-body-c" class="mt-2 p-3 bg-white/60 border gold-border rounded-lg whitespace-pre-wrap max-h-56 overflow-y-auto hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Error Log, Request, Remarks & Confirm -->
+                        <div class="theme-card bg-white rounded-2xl p-5 border gold-border shadow-sm space-y-4 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <h3 class="text-xs font-black text-gold uppercase tracking-wider border-b gold-border pb-2">ATTACHMENT &amp; PROBLEM INFORMATION</h3>
+
+                                <div class="p-4 bg-rose-950/40 border border-rose-500/40 rounded-xl space-y-1.5 text-xs">
+                                    <p class="font-bold text-rose-300 flex items-center">
+                                        <i class="fa-solid fa-bug mr-2"></i> Parsing Error Log
+                                    </p>
+                                    <p id="detail-error-log-c" class="text-rose-200/80 font-mono text-[11px] leading-relaxed">
+                                        MIME / JSON Parsing Exception: body empty, null-byte corrupted, or unparseable payload.
+                                    </p>
+                                </div>
+
+                                <div class="space-y-1 pt-2">
+                                    <label class="theme-text-main text-xs font-bold text-navy flex items-center">
+                                        <i class="fa-solid fa-comment-dots mr-1.5 gold-text"></i> Review Remarks:
+                                    </label>
+                                    <textarea id="review-remarks-corrupted" oninput="checkConfirmStatus('corrupted')" placeholder="Type your inspection remarks here to enable confirmation..."
+                                              class="theme-input w-full h-20 p-2.5 bg-ivory border gold-border rounded-xl text-xs text-navy focus:outline-none focus:ring-2 focus:ring-gold/50 transition"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2 pt-2">
+                                <button onclick="triggerRequestNewAttachment('corrupted')" class="w-full py-2.5 bg-navy hover:bg-navy-light text-gold border gold-border font-extrabold text-xs rounded-xl shadow transition flex items-center justify-center">
+                                    <i class="fa-solid fa-paper-plane mr-2"></i> Request Resend
+                                </button>
+
+                                <button id="btn-confirm-corrupted" disabled onclick="handleConfirm('corrupted')" class="w-full py-2.5 bg-gray-400 text-white font-extrabold text-xs rounded-xl cursor-not-allowed transition flex items-center justify-center">
+                                    <i class="fa-solid fa-check-circle mr-2"></i> Confirm Review
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Email Detail Modal -->
+    <div id="email-detail-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="theme-card bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 space-y-4 border-2 gold-border-solid relative transition-colors duration-300">
+            <div class="flex items-center justify-between border-b gold-border pb-3">
+                <h3 class="theme-text-main font-extrabold text-navy text-base flex items-center">
+                    <i class="fa-solid fa-envelope-open-text gold-text mr-2"></i> Email Detail
+                </h3>
+                <button onclick="closeModal('email-detail-modal')" class="theme-text-muted text-navy/50 hover:text-gold transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">From</p>
+                    <p id="ed-sender" class="theme-text-main font-bold text-navy mt-0.5 break-all">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Received</p>
+                    <p id="ed-received" class="theme-text-main font-bold text-navy mt-0.5">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3 sm:col-span-2">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Subject</p>
+                    <p id="ed-subject" class="theme-text-main font-bold text-navy mt-0.5 break-words">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3 sm:col-span-2">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Category</p>
+                    <div class="mt-1.5"><span id="ed-category" class="px-2.5 py-0.5 bg-gold/15 text-gold border gold-border rounded-md font-bold text-[10px] uppercase tracking-wide">—</span></div>
+                </div>
+            </div>
+
+            <div>
+                <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px] mb-1.5">Message Body</p>
+                <div id="ed-body" class="theme-input p-4 bg-ivory-light border gold-border rounded-xl text-xs text-navy/90 leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto">—</div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div id="ed-attachments" class="text-[11px] text-navy/60"></div>
+                <button onclick="closeModal('email-detail-modal')" class="px-5 py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl shadow hover:brightness-105 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="theme-card bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border-2 gold-border-solid relative transition-colors duration-300">
+            <div class="flex items-center justify-between border-b gold-border pb-3">
+                <h3 class="theme-text-main font-extrabold text-navy text-base flex items-center">
+                    <i class="fa-solid fa-user gold-text mr-2"></i> User Profile
+                </h3>
+                <button onclick="closeModal('profile-modal')" class="theme-text-muted text-navy/50 hover:text-gold transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div id="profile-avatar" class="w-16 h-16 rounded-2xl gold-gradient text-navy-dark flex items-center justify-center font-black text-2xl shadow-md border border-ivory/20">C</div>
+                <div class="min-w-0">
+                    <p id="profile-name" class="theme-text-main font-extrabold text-navy text-lg leading-tight">—</p>
+                    <p id="profile-role" class="theme-text-sub text-xs gold-text font-bold mt-0.5">—</p>
+                    <p id="profile-email" class="theme-text-muted text-[11px] text-navy/60 mt-0.5 truncate">—</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Job Title</p>
+                    <p id="profile-job-title" class="theme-text-main font-bold text-navy mt-0.5">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Department</p>
+                    <p id="profile-department" class="theme-text-main font-bold text-navy mt-0.5">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Employee ID</p>
+                    <p id="profile-employee-id" class="theme-text-main font-mono font-bold text-navy mt-0.5">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Phone</p>
+                    <p id="profile-phone" class="theme-text-main font-bold text-navy mt-0.5">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Location</p>
+                    <p id="profile-location" class="theme-text-main font-bold text-navy mt-0.5">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Joined</p>
+                    <p id="profile-joined" class="theme-text-main font-bold text-navy mt-0.5">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Timezone</p>
+                    <p id="profile-timezone" class="theme-text-main font-bold text-navy mt-0.5">—</p>
+                </div>
+                <div class="theme-input bg-ivory rounded-xl border gold-border p-3">
+                    <p class="theme-text-muted text-navy/50 font-bold uppercase text-[10px]">Last Login</p>
+                    <p id="profile-last-login" class="theme-text-main font-bold text-navy mt-0.5">—</p>
+                </div>
+            </div>
+
+            <button onclick="closeModal('profile-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl shadow hover:brightness-105 transition">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="theme-card bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border-2 gold-border-solid relative transition-colors duration-300">
+            <div class="flex items-center justify-between border-b gold-border pb-3">
+                <h3 class="theme-text-main font-extrabold text-navy text-base flex items-center">
+                    <i class="fa-solid fa-gear gold-text mr-2"></i> Settings
+                </h3>
+                <button onclick="closeModal('settings-modal')" class="theme-text-muted text-navy/50 hover:text-gold transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 py-2">
+                <div class="flex items-center justify-between p-4 theme-input bg-ivory rounded-xl border gold-border">
+                    <div class="flex items-center space-x-3">
+                        <i id="theme-icon" class="fa-solid fa-sun text-gold text-lg"></i>
+                        <div>
+                            <p class="theme-text-main font-bold text-xs">Appearance Mode</p>
+                            <p id="theme-mode-label" class="theme-text-muted text-[11px] text-navy/60">Light Mode</p>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="theme-toggle" onchange="toggleTheme()" class="sr-only peer">
+                        <div class="w-11 h-6 bg-navy-light peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold"></div>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="closeModal('settings-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl shadow hover:brightness-105 transition">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div id="logout-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="theme-card bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border-2 gold-border-solid transition-colors duration-300">
+            <div class="w-12 h-12 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center text-xl mx-auto border border-rose-200">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <div>
+                <h3 class="theme-text-main font-extrabold text-navy text-base">Confirm Logout</h3>
+                <p class="theme-text-sub text-xs text-navy/60 mt-1">Are you sure you want to exit your HarryPort session?</p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="closeModal('logout-modal')" class="flex-1 py-2.5 theme-input bg-ivory text-navy font-bold text-xs rounded-xl border gold-border">
+                    Cancel
+                </button>
+                <button onclick="signOut()" class="flex-1 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow">
+                    Log Out
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js?v=20260921e"></script>
+    <script src="/static/js/inbox.js?v=20260921e"></script>
+    <script src="/static/js/human_review.js?v=20260921e"></script>
+</body>
+</html>
