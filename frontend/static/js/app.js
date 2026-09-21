@@ -300,6 +300,9 @@ document.addEventListener("DOMContentLoaded", () => {
   applyTheme(savedTheme === "dark");
   requireSession().then(() => {
     renderUserBadge();
-    Promise.allSettled([loadInbox(), loadHumanReview(), updateDashboardSummary()]);
+    Promise.allSettled([loadInbox(), loadHumanReview(), updateDashboardSummary()]).then(() => {
+      const view = new URLSearchParams(window.location.search).get('view');
+      if (view === 'review') switchReviewSubPage('dashboard');
+    });
   });
 });
