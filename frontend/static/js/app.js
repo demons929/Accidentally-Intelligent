@@ -302,8 +302,14 @@ document.addEventListener("DOMContentLoaded", () => {
   requireSession().then(() => {
     renderUserBadge();
     Promise.allSettled([loadInbox(), loadHumanReview(), updateDashboardSummary()]).then(() => {
-      const view = new URLSearchParams(window.location.search).get('view');
-      if (view === 'review') switchReviewSubPage('dashboard');
+      const params = new URLSearchParams(window.location.search);
+      const view = params.get('view');
+      if (view === 'review') {
+        switchReviewSubPage('dashboard');
+      } else {
+        const cat = params.get('category');
+        if (cat) filterByCategory(cat);
+      }
     });
   });
 });
