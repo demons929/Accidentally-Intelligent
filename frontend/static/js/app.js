@@ -172,8 +172,9 @@ async function updateDashboardSummary() {
   const unreadable = summary.human_review.unreadable || 0;
   const corrupted = summary.human_review.corrupted || 0;
   const resolved = summary.human_review.resolved || 0;
+  const pending = summary.human_review.pending ?? (unreadable + corrupted);
   const reviewBadge = document.getElementById("review-badge");
-  if (reviewBadge) reviewBadge.innerText = unreadable + corrupted;
+  if (reviewBadge) reviewBadge.innerText = pending;
 
   [
     ["unreadable-count", unreadable],

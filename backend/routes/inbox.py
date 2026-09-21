@@ -83,9 +83,10 @@ def email_stats(db: Session = Depends(get_db)) -> SummaryOut:
         Email.is_human_review.is_(True),
         Email.is_resolved.is_(False),
     )
-    review_counts = {"unreadable": 0, "corrupted": 0, "resolved": 0}
+    review_counts = {"unreadable": 0, "corrupted": 0, "resolved": 0, "pending": 0}
     for record in pending_review.all():
-        if record.review_type in review_counts:
+        review_counts["pending"] += 1
+        if record.review_type in {"unreadable", "corrupted"}:
             review_counts[record.review_type] += 1
     review_counts["resolved"] = db.query(Email).filter(
         Email.is_human_review.is_(True),
