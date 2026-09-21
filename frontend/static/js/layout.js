@@ -137,6 +137,19 @@
         <button onclick="closeModal('profile-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl">Close</button>
       </div>
     </div>
+    <div id="settings-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border gold-border">
+        <div class="flex items-center justify-between border-b gold-border pb-3">
+          <h3 class="font-extrabold text-navy text-base"><i class="fa-solid fa-gear gold-text mr-2"></i>Settings</h3>
+          <button onclick="closeModal('settings-modal')" class="text-navy/50 hover:text-gold"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-bold text-navy">Dark mode</span>
+          <button onclick="toggleTheme()" class="px-3 py-1.5 text-xs font-bold rounded-lg border gold-border bg-ivory text-navy">Toggle</button>
+        </div>
+        <button onclick="closeModal('settings-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl">Close</button>
+      </div>
+    </div>
     <div id="logout-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center space-y-4 border gold-border">
         <div class="w-12 h-12 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center text-xl mx-auto border border-rose-200"><i class="fa-solid fa-right-from-bracket"></i></div>
