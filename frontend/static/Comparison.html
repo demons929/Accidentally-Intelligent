@@ -188,7 +188,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 <div class="flex items-center space-x-4">
 <button class="p-2 text-ivory/80 hover:text-gold"><i class="fa-solid fa-bell text-lg"></i></button>
 <div class="h-6 w-px bg-gold/20"></div>
-<div class="flex items-center space-x-3">
+<div class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition" onclick="openProfileModal()" title="View profile">
 <div id="cmp-header-avatar" class="w-9 h-9 rounded-xl gold-gradient text-navy-dark flex items-center justify-center font-black">C</div>
 <div class="hidden sm:block">
 <p id="cmp-header-user-name" class="text-xs font-bold">Captain</p>
@@ -541,6 +541,16 @@ async function requireSession() {
   window.location.href = '/login.html';
 }
 
+
+function openModal(id) { const n = document.getElementById(id); if (n) n.classList.remove('hidden'); }
+function closeModal(id) { const n = document.getElementById(id); if (n) n.classList.add('hidden'); }
+function openProfileModal() { renderProfile(); openModal('profile-modal'); }
+function renderProfile() {
+  const u = getUser(); if (!u) return;
+  const set = (id, v) => { const n = document.getElementById(id); if (n) n.innerText = v || '\u2014'; };
+  const av = document.getElementById('cmp-profile-avatar'); if (av) av.innerText = (u.name||'C').trim().charAt(0).toUpperCase();
+  set('cmp-profile-name', u.name); set('cmp-profile-role', u.role); set('cmp-profile-email', u.email);
+}
 function signOut() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem('harryport_user');
@@ -1167,5 +1177,19 @@ requireSession().then(() => {
   loadComparisonData();
 });
 </script>
+
+<div id="profile-modal" class="hidden fixed inset-0 bg-navy/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 space-y-4 border gold-border">
+    <div class="flex items-center justify-between border-b gold-border pb-3">
+      <h3 class="font-extrabold text-navy text-base"><i class="fa-solid fa-user gold-text mr-2"></i>User Profile</h3>
+      <button onclick="closeModal('profile-modal')" class="text-navy/50 hover:text-gold"><i class="fa-solid fa-xmark text-lg"></i></button>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div id="cmp-profile-avatar" class="w-14 h-14 rounded-2xl gold-gradient text-navy-dark flex items-center justify-center font-black text-xl">C</div>
+      <div><p id="cmp-profile-name" class="font-extrabold text-navy">&mdash;</p><p id="cmp-profile-role" class="text-[10px] gold-text font-bold mt-0.5">&mdash;</p><p id="cmp-profile-email" class="text-[11px] text-navy/60 mt-0.5">&mdash;</p></div>
+    </div>
+    <button onclick="closeModal('profile-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl">Close</button>
+  </div>
+</div>
 </body>
 </html>
