@@ -1,4 +1,6 @@
 let lastLoadedEmails = [];
+let inboxPage = 1;
+const PAGE_SIZE = 50;
 
 async function loadInbox() {
   const category = document.getElementById("category-filter")?.value || "All";
@@ -9,13 +11,20 @@ async function loadInbox() {
   params.set("page_size", "1000");
   const payload = await apiGet(`/api/emails${params.toString() ? `?${params}` : ""}`);
   lastLoadedEmails = payload.items;
-  renderInbox(payload.items, category, payload.total);
+  inboxPage = 1;
+  renderInbox(lastLoadedEmails, category, payload.total);
 }
 
 function renderInbox(emails, category, total) {
   const list = document.getElementById("email-list");
   if (!list) return;
-  list.innerHTML = emails
+
+  const pageCount = Math.max(1, Math.ceil(emails.length / PAGE_SIZE));
+  if (inboxPage > pageCount) inboxPage = pageCount;
+  const start = (inboxPage - 1) * PAGE_SIZE;
+  const pageItems = emails.slice(start, start + PAGE_SIZE);
+
+  list.innerHTML = pageItems
     .map(
       (email) => `
       <div class="email-row p-4 hover:bg-gold/10 transition cursor-pointer flex items-center justify-between group" data-category="${escapeHtml(email.category)}" onclick="openEmailDetail('${escapeHtml(email.email_id)}')">
@@ -47,56 +56,36 @@ function renderInbox(emails, category, total) {
 
   const showing = document.getElementById("showing-count");
   if (showing) {
-    showing.innerText =
-      category === "All" ? `Showing ${emails.length} of ${total} emails` : `Showing ${total} email(s) in "${category}"`;
+    const from = emails.length ? start + 1 : 0;
+    const to = Math.min(start + PAGE_SIZE, emails.length);
+    showing.innerText = category === "All"
+      ? `Showing ${from}-${to} of ${total} emails`
+      : `Showing ${from}-${to} of ${total} in "${category}"`;
   }
+
+  renderPager(pageCount);
 }
 
-function filterByCategory(category) {
-  const select = document.getElementById("category-filter");
-  if (select) select.value = category;
-  switchView("inbox");
-  loadInbox();
-}
-
-function searchEmails() {
-  loadInbox();
-}
-
-function applyFilters() {
-  loadInbox();
-}
-
-function openEmailDetail(emailId) {
-  const email = lastLoadedEmails.find((entry) => entry.email_id === emailId);
-  if (!email) return;
-  const setText = (id, value) => {
-    const node = document.getElementById(id);
-    if (node) node.innerText = value || "—";
-  };
-  setText("ed-sender", email.sender || "Unknown sender");
-  setText("ed-subject", email.subject || "(no subject)");
-  setText("ed-received", formatReceived(email.received_time));
-  setText("ed-category", email.category || "Uncategorized");
-  const body = document.getElementById("ed-body");
-  if (body) body.innerText = email.body || email.preview || "(No message body available for this email.)";
-  const attachments = document.getElementById("ed-attachments");
-  if (attachments) {
-    const files = Array.isArray(email.attachments) ? email.attachments : [];
-    attachments.innerText = files.length ? `Attachments: ${files.map((f) => f.split(/[\\/]/).pop()).join(", ")}` : "No attachments";
+function renderPager(pageCount) {
+  let pager = document.getElementById("inbox-pager");
+  if (!pager) return;
+  const cur = inboxPage;
+  const btn = (label, page, disabled, active) =>
+    `<button onclick="goInboxPage(${page})" ${disabled || active ? "disabled" : ""}
+      class="px-3 py-1.5 text-xs font-bold rounded-lg border gold-border transition
+      ${active ? "bg-navy text-gold" : disabled ? "opacity-40 cursor-not-allowed bg-ivory" : "bg-white text-navy hover:bg-gold/10"}">${label}</button>`;
+  let html = btn("Prev", cur - 1, cur <= 1, false);
+  for (let i = 1; i <= pageCount; i++) {
+    const from = (i - 1) * PAGE_SIZE + 1;
+    const to = Math.min(i * PAGE_SIZE, lastLoadedEmails.length);
+    html += btn(`${from}-${to}`, i, false, i === cur);
   }
-  openModal("email-detail-modal");
+  html += btn("Next", cur + 1, cur >= pageCount, false);
+  pager.innerHTML = html;
 }
 
-async function changeEmailCategory(selectElement) {
-  const emailId = selectElement.dataset.emailId;
-  const category = selectElement.value;
-  if (!emailId || !category) return;
-  try {
-    await apiPost(`/api/emails/${encodeURIComponent(emailId)}/move`, { category });
-    await loadInbox();
-    await updateDashboardSummary();
-  } catch (error) {
-    alert(`Could not move email: ${error.message}`);
-  }
+function goInboxPage(page) {
+  inboxPage = page;
+  const category = document.getElementById("category-filter")?.value || "All";
+  renderInbox(lastLoadedEmails, category, lastLoadedEmails.length);
 }
