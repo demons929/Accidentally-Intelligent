@@ -79,6 +79,7 @@ def seed_comparison_cases(db: Session, settings: Settings | None = None) -> int:
             subject=email.subject,
             attachment_paths=[str(item) for item in attachments],
             base_dir=settings.data_dir,
+            body=email.body or "",
         )
         payload = result.to_case_dict()
         payloads.append(payload)

@@ -472,12 +472,26 @@ def _pick_attachment(attachment_paths: list[str], marker: str) -> str | None:
     return None
 
 
+def _explicitly_asks_for_comparison(subject: str, body: str) -> bool:
+    """True when the email clearly asked to compare an SI against a BL.
+
+    Used to tell a genuine "please compare SI + BL, the attachments dropped"
+    edge case (escalate) apart from a routine "please send me the draft BL"
+    follow-up with no pair to compare (treat as clean).
+    """
+    text = f"{subject or ''} {body or ''}".casefold()
+    return "compare" in text and (
+        "si" in text or "draft bl" in text or "bill of lading" in text
+    )
+
+
 def analyze_email(
     email_id: str,
     sender: str,
     subject: str,
     attachment_paths: list[str],
     base_dir: Path,
+    body: str = "",
 ) -> ComparisonResult:
     """Full analysis pipeline for one email: locate docs, read them, compare.
 
@@ -502,8 +516,17 @@ def analyze_email(
     if not si_att or not bl_att:
         base_result.si_file = si_att or ""
         base_result.bl_file = bl_att or ""
-        base_result.review_reason = "missing_attachment"
-        base_result.error = "Could not locate both SI and BL attachments."
+        # A missing-attachment escalation is a genuine edge case only when the
+        # email actually asked to compare an SI and a BL (e.g. "Please compare
+        # the SI and draft BL ... attachments dropped"). A routine "please send
+        # the draft BL" follow-up with no docs is clean (OK), not a defect.
+        if _explicitly_asks_for_comparison(subject, body):
+            base_result.review_reason = "missing_attachment"
+            base_result.error = "Could not locate both SI and BL attachments."
+        else:
+            base_result.status = "OK"
+            base_result.review_reason = None
+            base_result.error = None
         return base_result
 
     base_result.si_file = si_att
