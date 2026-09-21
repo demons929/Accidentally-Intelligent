@@ -51,6 +51,7 @@ class Email(Base):
     confidence: Mapped[float] = mapped_column(Float, default=0.0)
     attachments: Mapped[str] = mapped_column(Text, default="[]")
     error: Mapped[str | None] = mapped_column(Text)
+    review_remark: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
@@ -91,6 +92,7 @@ class ComparisonCase(Base):
 def init_db() -> None:
     _recreate_emails_table_if_schema_changed()
     Base.metadata.create_all(bind=engine)
+    _add_review_remark_column()
 
 
 def _recreate_emails_table_if_schema_changed() -> None:
@@ -119,6 +121,19 @@ def _recreate_emails_table_if_schema_changed() -> None:
     if required_columns.issubset(existing_columns):
         return
     Base.metadata.drop_all(bind=engine, tables=[Email.__table__])
+
+
+def _add_review_remark_column() -> None:
+    """Lightweight migration: add review_remark column if missing (no data loss)."""
+    inspector = inspect(engine)
+    if "emails" not in inspector.get_table_names():
+        return
+    cols = {c["name"] for c in inspector.get_columns("emails")}
+    if "review_remark" in cols:
+        return
+    with engine.connect() as conn:
+        conn.execute(__import__("sqlalchemy").text("ALTER TABLE emails ADD COLUMN review_remark TEXT"))
+        conn.commit()
 
 
 def get_db():

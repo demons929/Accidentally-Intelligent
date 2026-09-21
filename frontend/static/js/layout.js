@@ -187,6 +187,26 @@
   }
 };
 window.selectTheme = function (dark) { if (typeof applyTheme === "function") { applyTheme(dark); syncThemeSwitch(); } };
+  window.loadSidebarCounts = async function () {
+    try {
+      const res = await fetch("/api/emails/stats", { headers: (typeof authHeaders === "function") ? authHeaders() : {} });
+      if (!res.ok) return;
+      const data = await res.json();
+      const map = {
+        "sidebar-count-comparison": data.categories["Comparison requests"],
+        "sidebar-count-si": data.categories["New SI requests"],
+        "sidebar-count-invoice": data.categories["Invoice queries"],
+        "sidebar-count-general": data.categories["General mail"],
+        "sidebar-count-spam": data.categories["Spam"],
+      };
+      for (const [id, val] of Object.entries(map)) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val ?? 0;
+      }
+      const badge = document.getElementById("review-badge");
+      if (badge) badge.innerText = (data.human_review && data.human_review.pending) || 0;
+    } catch (e) { /* non-fatal */ }
+  };
   window.mountLayout = function ({ active = "inbox", title = "Inbox", subtitle } = {}) {
     const map = { inbox: "nav-inbox", review: "nav-review", comparison: "nav-comparison" };
     active = map[active] || active;
@@ -196,5 +216,6 @@ window.selectTheme = function (dark) { if (typeof applyTheme === "function") { a
     if (tb) { tb.innerHTML = topbarHtml(title, subtitle); }
     const modals = document.getElementById("hp-modals");
     if (modals) modals.innerHTML = modalsHtml();
+    if (typeof loadSidebarCounts === 'function') loadSidebarCounts();
   };
 })();

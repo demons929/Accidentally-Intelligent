@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.database import Email, get_db
-from backend.schemas import HumanReviewOut
+from backend.schemas import HumanReviewOut, HumanReviewResolveIn
 
 
 router = APIRouter(prefix="/api/human-review", tags=["human-review"])
@@ -29,6 +29,7 @@ def serialize_review(record: Email) -> HumanReviewOut:
         confidence=record.confidence,
         attachments=json.loads(record.attachments or "[]"),
         error=record.error,
+        review_remark=record.review_remark,
     )
 
 
@@ -62,12 +63,14 @@ def resolved_cases(db: Session = Depends(get_db)) -> list[HumanReviewOut]:
 
 
 @router.post("/{email_id}/resolve", response_model=HumanReviewOut)
-def resolve_case(email_id: str, db: Session = Depends(get_db)) -> HumanReviewOut:
+def resolve_case(email_id: str, payload: HumanReviewResolveIn | None = None, db: Session = Depends(get_db)) -> HumanReviewOut:
     record = db.query(Email).filter((Email.email_id == email_id) | (Email.id == _int_or_none(email_id))).one_or_none()
     if record is None or not record.is_human_review:
         raise HTTPException(status_code=404, detail="Human review case not found")
     record.is_resolved = True
     record.status = "Classified" if record.category else "Pending"
+    if payload is not None and payload.remark:
+        record.review_remark = payload.remark
     db.commit()
     db.refresh(record)
     return serialize_review(record)

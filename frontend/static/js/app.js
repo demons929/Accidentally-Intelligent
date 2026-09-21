@@ -124,6 +124,15 @@ async function apiPost(path, body) {
   return response.json();
 }
 
+async function apiDelete(path) {
+  const response = await fetch(`${API_BASE}${path}`, { method: "DELETE", headers: authHeaders() });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.detail || `API request failed: ${response.status}`);
+  }
+  return response.json();
+}
+
 /* ------------------------------------------------------------------ */
 /* Rendering helpers                                                   */
 /* ------------------------------------------------------------------ */

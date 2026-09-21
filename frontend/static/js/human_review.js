@@ -136,7 +136,11 @@ function openReviewDetail(emailId) {
   setText("detail-error-log-c", item.error || "MIME / JSON parsing failed for this email.");
 
   const remarks = document.getElementById(`review-remarks-${type}`);
-  if (remarks) remarks.value = "";
+  if (remarks) {
+    remarks.value = item.review_remark || "";
+    remarks.readOnly = !!item.is_resolved;
+    remarks.classList.toggle("opacity-60", !!item.is_resolved);
+  }
   const confirmBtn = document.getElementById(`btn-confirm-${type}`);
   if (confirmBtn) {
     if (item.is_resolved) {

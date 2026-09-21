@@ -116,6 +116,16 @@ def move_email(email_id: str, payload: MoveEmailIn, db: Session = Depends(get_db
     return serialize_email(record)
 
 
+@router.delete("/api/emails/{email_id}")
+def delete_email(email_id: str, db: Session = Depends(get_db)) -> dict:
+    record = db.query(Email).filter((Email.email_id == email_id) | (Email.id == _int_or_none(email_id))).one_or_none()
+    if record is None:
+        raise HTTPException(status_code=404, detail="Email not found")
+    db.delete(record)
+    db.commit()
+    return {"deleted": email_id}
+
+
 def _int_or_none(value: str) -> int | None:
     try:
         return int(value)

@@ -28,7 +28,8 @@ function renderInbox(emails, category, total) {
     .map(
       (email) => `
       <div class="email-row p-4 hover:bg-gold/10 transition cursor-pointer flex items-center justify-between group" data-category="${escapeHtml(email.category)}" onclick="openEmailDetail('${escapeHtml(email.email_id)}')">
-        <div class="flex items-center space-x-4 min-w-0">
+        <div class="flex items-center space-x-3 min-w-0">
+          ${email.category === "Spam" ? `<input type="checkbox" class="spam-check accent-rose-600 w-4 h-4 shrink-0" onclick="event.stopPropagation()" data-email-id="${escapeHtml(email.email_id)}">` : ""}
           <div class="w-10 h-10 rounded-xl bg-navy text-gold font-extrabold flex items-center justify-center shrink-0 border gold-border group-hover:scale-105 transition-transform shadow-sm">${escapeHtml(initials(email.sender))}</div>
           <div class="min-w-0">
             <div class="flex items-center space-x-2">
@@ -49,6 +50,7 @@ function renderInbox(emails, category, total) {
             <option value="General mail">General</option>
             <option value="Spam">Spam</option>
           </select>
+          ${email.category === "Spam" ? `<button onclick="event.stopPropagation(); deleteSpamEmail('${escapeHtml(email.email_id)}')" class="px-2 py-1.5 bg-rose-700 hover:bg-rose-800 text-white text-[10px] font-bold rounded-lg border border-rose-500/40 shadow-sm transition" title="Delete spam"><i class="fa-solid fa-trash"></i></button>` : ""}
         </div>
       </div>`
     )
@@ -95,4 +97,41 @@ function goInboxPage(page) {
   inboxPage = page;
   const category = document.getElementById("category-filter")?.value || "All";
   renderInbox(lastLoadedEmails, category, lastLoadedEmails.length);
+}
+
+async function changeEmailCategory(sel) {
+  const id = sel.getAttribute("data-email-id");
+  const category = sel.value;
+  if (!id || !category) return;
+  try {
+    await apiPost(`/api/emails/${encodeURIComponent(id)}/move`, { category });
+    await loadInbox();
+    if (typeof loadSidebarCounts === "function") loadSidebarCounts();
+  } catch (e) {
+    alert("Failed to move email: " + (e.message || e));
+  }
+}
+
+async function deleteSpamEmail(id) {
+  if (!id) return;
+  if (!confirm("Delete this spam email? This cannot be undone.")) return;
+  try {
+    await apiDelete(`/api/emails/${encodeURIComponent(id)}`);
+    await loadInbox();
+    if (typeof loadSidebarCounts === "function") loadSidebarCounts();
+  } catch (e) {
+    alert("Failed to delete: " + (e.message || e));
+  }
+}
+
+async function deleteSelectedSpam() {
+  const checks = document.querySelectorAll(".spam-check:checked");
+  if (!checks.length) { alert("No spam emails selected."); return; }
+  if (!confirm(`Delete ${checks.length} selected spam email(s)? This cannot be undone.`)) return;
+  for (const c of checks) {
+    try { await apiDelete(`/api/emails/${encodeURIComponent(c.dataset.emailId)}`); }
+    catch (e) { console.error("delete failed", c.dataset.emailId, e); }
+  }
+  await loadInbox();
+  if (typeof loadSidebarCounts === "function") loadSidebarCounts();
 }

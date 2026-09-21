@@ -22,6 +22,7 @@ class EmailOut(BaseModel):
 
 class HumanReviewOut(EmailOut):
     error: str | None
+    review_remark: str | None = None
 
 
 class SummaryOut(BaseModel):
@@ -104,4 +105,8 @@ class ComparisonResolveIn(BaseModel):
     """Optional corrected field values applied during human review."""
 
     fields: dict[str, str] | None = None
+    remark: str | None = None
+
+
+class HumanReviewResolveIn(BaseModel):
     remark: str | None = None
