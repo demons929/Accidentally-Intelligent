@@ -143,9 +143,16 @@
           <h3 class="font-extrabold text-navy text-base"><i class="fa-solid fa-gear gold-text mr-2"></i>Settings</h3>
           <button onclick="closeModal('settings-modal')" class="text-navy/50 hover:text-gold"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-bold text-navy">Dark mode</span>
-          <button onclick="toggleTheme()" class="px-3 py-1.5 text-xs font-bold rounded-lg border gold-border bg-ivory text-navy">Toggle</button>
+        <div>
+          <p class="text-sm font-bold text-navy mb-2">Theme</p>
+          <div class="space-y-2">
+            <label class="flex items-center gap-2 cursor-pointer text-sm text-navy">
+              <input type="radio" name="hp-theme" value="light" onchange="selectTheme(false)" class="accent-[#C6A15B]"> Light
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-sm text-navy">
+              <input type="radio" name="hp-theme" value="dark" onchange="selectTheme(true)" class="accent-[#C6A15B]"> Dark
+            </label>
+          </div>
         </div>
         <button onclick="closeModal('settings-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl">Close</button>
       </div>
@@ -163,6 +170,7 @@
   }
 
   /* ---------- mount ---------- */
+  window.selectTheme = function (dark) { if (typeof applyTheme === "function") applyTheme(dark); };
   window.mountLayout = function ({ active = "inbox", title = "Inbox", subtitle } = {}) {
     const map = { inbox: "nav-inbox", review: "nav-review", comparison: "nav-comparison" };
     active = map[active] || active;
