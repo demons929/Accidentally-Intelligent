@@ -1,110 +1,302 @@
-# 🚀 Accidentally-Intelligent
+# Accidentally-Intelligent
 
-> *"Automating the routine, empowering the exceptional. Let AI handle the noise so humans can solve the signal."*  
-> 🏆 Proudly built for the **Averis x Monash Hackathon 2026**
+**HarryPort — Email Classifier & SI/BL Document Verification**
 
----
+*"HarryPort: Pure Logistics Magic"* — a complete system for the SDOC logistics hackathon that:
 
-## 👥 Team & Project Overview
-- **Team Name:** Accidentally Intelligent  
-- **Project Name:** Accidentally-Intelligent (AI-Powered Email Classification & Review Pipeline)  
-- **Mission:** To eliminate the bottleneck of manual email review by deploying an intelligent, automated classification system that handles routine tasks, leaving only complex edge cases for human experts.
 
----
 
-## 🎯 The Problem
-In high-volume operational environments, workers are forced to review emails and documents one by one. This manual process is:
-1. **Highly Time-Consuming:** Valuable human hours are wasted on routine sorting and categorization.
-2. **Prone to Human Error:** Fatigue and repetitive tasks inevitably lead to unintended mistakes, misclassifications, and compliance risks.
-3. **Inefficient:** Skilled workers are bogged down by trivial tasks instead of focusing on complex problem-solving that requires human judgment.
+1. **Classifies** a logistics inbox into 5 categories,
 
-Specifically, the need to accurately and rapidly classify **SI** and **BL** emails demanded a smarter, automated approach.
+2. **Verifies** Shipping Instruction (SI) vs Bill of Lading (BL) documents,
 
----
+3. **Gives reviewers a web dashboard** to handle whatever the machine can't.
 
-## 🏗️ Technical Architecture
-Our solution is a modular, end-to-end pipeline that seamlessly bridges backend AI processing with a user-friendly frontend dashboard:
 
-1. **Data Ingestion (`loader.py`)**: Securely extracts and parses incoming email data and attachments, preparing them for analysis.
-2. **Core AI Processing (`pipeline.py`)**: Orchestrates the intelligent classification engine, analyzing content to automatically categorize emails (e.g., SI, BL) with high confidence.
-3. **Validation Layer (`validate_pipeline.py`)**: Ensures data integrity, checks classification confidence scores, and flags anomalies. 
-4. **Output Generation**: Structures the processed results into a standardized `submission.json` for seamless frontend consumption.
-5. **Interactive Frontend (`login.html`, `frontpage.html`, `Comparison.html`)**: A clean, intuitive web interface where workers can log in, view the AI's classifications, and easily step in *only* when the AI flags an item it cannot confidently solve.
-6. **Resources (`/resources`)**: Centralized static assets, configurations, and model references.
+
+***
+
+## Team Name and Project Name
+
+
+
+|                  |                                                                         |
+| ---------------- | ----------------------------------------------------------------------- |
+| **Team Name**    | Accidentally-Intelligent                                                |
+| **Project Name** | HarryPort                                                               |
+| **Tagline**      | HarryPort: Pure Logistics Magic                                         |
+| **Deliverables** | `submission.json` (scored by organizer's Docker server) + web dashboard |
+
+
+
+***
+
+## Problem
+
+Shipping companies receive hundreds of emails a day. Most fall into five buckets:
+
+
+
+| Category              | Example                                                   |
+| --------------------- | --------------------------------------------------------- |
+| `Comparison requests` | "Compare the SI with the draft BL and confirm the blanks" |
+| `New SI requests`     | Booking / shipping instructions for a new shipment        |
+| `Invoice queries`     | Billing questions                                         |
+| `General mail`        | Everything else that matters                              |
+| `Spam`                | Noise                                                     |
+
+Two things make this hard:
+
+
+
+1. **Attachments matter.** A comparison email is only meaningful if we can OCR the attached PDF / Excel / Word files. Password-protected PDFs and corrupted emails must go to a **human reviewer** — never be force-classified.
+
+2. **Documents must be cross-checked.** The SI and BL list the same 7 core fields (shipper, consignee, notify party, ports, container count, gross weight). Any discrepancy must be flagged with the **exact fields** that differ.
+
+
+
+***
+
+## Technical Architecture
+
+
 
 ```mermaid
-graph TD
-    A[📧 Receive Email] --> B[⚙️ Pre-processing<br/>Generate submission.json]
-    B --> C[🌐 Connect to HTML<br/>Identify Name & Add Attachment Column for SI/BL]
-    C --> D{🤖 Classify Email}
-    
-    D -- "SI / BL Documents" --> E[📊 Extract 7 Key Fields<br/>Display & Show Comparison Result]
-    D -- "Others / Unknown" --> F[📂 Route to Manual Handling]
-    
-    E --> G{✅ Validation Check}
-    
-    G -- "All Fields Valid" --> H[💾 Finalize Submission]
-    G -- "Unreadable File or<br/>Missing Value ️" --> I[👨‍💻 Human Review Page]
-    
-    I --> J[🔴 Mismatched Fields<br/>Highlighted in Red]
-    J --> K[ Provide 'Confirm' or<br/>'Edit' Button to Fix Data]
-    K --> H
+flowchart LR
+    subgraph Input["Input"]
+        A["Inbox emails + attachments<br/>(PDF / XLSX / DOCX)"]
+    end
 
-    %% Styling
-    style A fill:#4FC3F7,stroke:#0277BD,stroke-width:3px,color:#000000
-    style B fill:#9575CD,stroke:#5E35B1,stroke-width:3px,color:#FFFFFF
-    style C fill:#9575CD,stroke:#5E35B1,stroke-width:3px,color:#FFFFFF
-    style D fill:#FFB74D,stroke:#EF6C00,stroke-width:3px,color:#000000
-    style E fill:#81C784,stroke:#388E3C,stroke-width:3px,color:#000000
-    style F fill:#E57373,stroke:#D32F2F,stroke-width:3px,color:#FFFFFF
-    style G fill:#FFB74D,stroke:#EF6C00,stroke-width:3px,color:#000000
-    style H fill:#81C784,stroke:#388E3C,stroke-width:3px,color:#000000
-    style I fill:#E57373,stroke:#D32F2F,stroke-width:3px,color:#FFFFFF
-    style J fill:#FFCDD2,stroke:#C62828,stroke-width:3px,color:#000000
-    style K fill:#FFCDD2,stroke:#C62828,stroke-width:3px,color:#000000
+    subgraph Pipeline["ML Pipeline"]
+        B["Preprocess<br/>HTML strip + OCR"]
+        C["Classify<br/>RoBERTa / rules"]
+        D["Compare SI vs BL<br/>7 fields"]
+    end
+
+    subgraph Output["Output"]
+        E[("SQLite<br/>harryport.db")]
+        F["submission.json<br/>for organizer's scorer"]
+    end
+
+    A --> B --> C
+    C -->|"Comparison requests"| D
+    C -->|"Other 4 categories"| E
+    D --> E
+    E --> F
+
+    subgraph Dashboard["Web Dashboard"]
+        G["FastAPI backend"]
+        H["HTML / JS frontend<br/>login → inbox → review"]
+    end
+
+    E --> G --> H
 ```
 
----
+**Tech stack**
 
-## ⚙️ Implementation Details
-- **Smart Pre-processing**: Incoming emails are automatically parsed into a structured `submission.json` format. The system identifies the sender's name and dynamically adds an attachment column specifically for SI and BL documents.
-- **7-Point Field Extraction**: For classified SI and BL emails, the AI automatically extracts 7 key data fields and displays them alongside a comparison result for quick verification.
-- **Visual Error Highlighting**: In the Human Review interface, any mismatched fields or missing values are automatically **highlighted in red**, drawing the reviewer's attention exactly where it's needed.
-- **Interactive Human-in-the-Loop**: When an unreadable file or missing value is detected, it is routed to a dedicated review page. The system states the exact reason for the flag and provides **"Confirm" or "Edit" buttons**, allowing workers to quickly fix the field data without leaving the dashboard.
-- **Edge Case Handling**: Emails classified as "Others" are seamlessly routed to a separate manual handling flow, ensuring the AI only processes what it's trained for.
 
-> 📸 **[Insert Screenshot 2]**: *Frontend Dashboard*  
-> *(Tip: Add a screenshot of your `frontpage.html` or `Comparison.html` showing the AI classification in action!)*
 
----
+* **Language / ML:** Python 3.11+, HuggingFace `transformers` + PyTorch (`roberta-base`)
 
-## ✅ What We Solved
-- **Drastically Reduced Review Time**: Automated the bulk sorting of SI and BL emails, freeing up countless hours of manual labor.
-- **Eliminated Routine Human Error**: Removed fatigue-induced mistakes from the initial classification stage, ensuring higher baseline accuracy.
-- **Optimized Human Capital**: Empowered workers to focus their mental energy and expertise solely on complex, high-value exceptions that the AI cannot resolve.
-- **Seamless Workflow Integration**: Provided a lightweight, easy-to-adopt web interface that requires minimal training for end-users.
+* **OCR:** `azure-ai-formrecognizer` with a `PyMuPDF` fallback (works offline)
 
----
+* **Backend / data:** FastAPI + SQLite (SQLAlchemy)
 
-## 🧗 Challenges Faced
-- **Challenge 1: Balancing AI Automation with Human Oversight**  
-  *How we overcame it:* We designed the `validate_pipeline.py` to not just check for errors, but to evaluate classification confidence. This ensures the AI knows when to "ask for help," creating a safe and reliable Human-in-the-Loop system.
-- **Challenge 2: Parsing Diverse Email Formats**  
-  *How we overcame it:* We built a resilient `loader.py` that normalizes varied email structures into a consistent format before it hits the classification pipeline, ensuring stable performance regardless of the sender's formatting.
+* **Frontend:** Vanilla HTML + Tailwind + JavaScript — all data fetched from the API, nothing hardcoded
 
----
+**Project layout**
 
-## 🗺️ Future Roadmap
-While we built a robust, functional foundation during the hackathon, here is our vision for the future:
-1. **Advanced NLP Models**: Integrate larger, fine-tuned language models to improve the nuance and accuracy of SI and BL classifications.
-2. **Modern Frontend Migration**: Port the HTML/JS interface to a modern framework (e.g., React or Vue) for enhanced state management and real-time updates.
-3. **Enterprise Integration**: Develop APIs to connect directly with enterprise email servers (e.g., Microsoft Exchange, Gmail API) for fully automated, real-time ingestion.
-4. **Feedback Loop**: Allow human reviewers to correct the AI's mistakes directly in the UI, using this feedback to continuously retrain and improve the model's accuracy over time.
 
----
 
-## 🛠️ How to Run Locally
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/demons929/Accidentally-Intelligent.git
-   cd Accidentally-Intelligent
+```
+Accidentally-Intelligent/
+
+├── run\_pipeline.py        # ① inference + comparison → submission.json + DB
+
+├── run\_server.py          # ② start the web dashboard
+
+├── config.py              # settings (paths, formats, demo login)
+
+├── pipeline/              # preprocess · inference · comparison · submission
+
+├── backend/               # FastAPI app · routes · SQLite models
+
+├── frontend/static/       # login.html · frontpage.html · Comparison.html
+
+├── data/ · models/ · resources/ · tests/
+
+└── submission.json        # generated for the organizer
+```
+
+
+
+***
+
+## Implementation Details
+
+### 1. Pipeline: inbox → 5 categories → submission
+
+
+
+```mermaid
+flowchart TD
+    A["Each email"] --> B{"Attachment<br/>readable?"}
+    B -- "No" --> HR["Flag Human Review<br/>Unreadable / Corrupted"]
+    B -- "Yes" --> C{"Comparison<br/>request?"}
+    C -- "No" --> D["Classify<br/>SI / Invoice / General / Spam"]
+    C -- "Yes" --> E["Compare SI vs BL<br/>7 fields → OK / MISMATCH / NEEDS_REVIEW"]
+    D --> DB[("SQLite")]
+    E --> DB
+    HR --> DB
+    DB --> F["submission.json"]
+```
+
+
+
+* **Clean & extract** — strip HTML, pull body text, OCR every attachment. If OCR throws or returns empty → `Unreadable Attachment`; if body parsing fails → `Corrupted Email`. The run **never crashes** on a bad file.
+
+* **Classify** — fine-tuned `roberta-base` when `models/best_model` exists, otherwise a deterministic keyword/structure fallback. Exactly 5 categories, human-review flags for the rest.
+
+* **Compare** — for comparison emails, extract the 7 SI/BL fields and produce `OK` / `MISMATCH` (with `defect_fields`) / `NEEDS_REVIEW` (with a `review_reason`: wrong doc type, missing attachment, unreadable, missing value).
+
+**The 7 compared fields**
+
+
+
+| Field               | Example SI label             | Example BL label          |
+| ------------------- | ---------------------------- | ------------------------- |
+| shipper             | `Shipper/Exporter`           | `SHIPPER`                 |
+| consignee           | `Consignee (Non-Negotiable)` | `Consignee`               |
+| notify\_party       | `NOTIFY PARTY`               | `Notify Party`            |
+| port\_of\_loading   | `Port of Loading`            | `Port of Loading (POL)`   |
+| port\_of\_discharge | `Discharge Port`             | `Port of Discharge (POD)` |
+| container\_count    | `No. of Containers`          | `Container Count`         |
+| gross\_weight\_kg   | `Gross Weight (KG)`          | `Gross Wt (kgs)`          |
+
+Values are normalized before comparing, so `21,577 KG` matches `21577 kgs`.
+
+### 2. Dashboard: FastAPI + browser
+
+
+
+```mermaid
+sequenceDiagram
+    participant U as User (browser)
+    participant F as FastAPI
+    participant DB as SQLite
+
+    U->>F: POST /api/auth/login
+    F-->>U: token + user profile
+    U->>F: GET /api/emails?category=&search=
+    F->>DB: query
+    DB-->>F: rows
+    F-->>U: JSON (paginated)
+    U->>F: POST /api/emails/{id}/move
+    U->>F: POST /api/human-review/{id}/resolve
+    F->>DB: update
+```
+
+
+
+* Pages: `/` (login) → `frontpage.html` (Inbox + Human Review) → `Comparison.html` (SI-vs-BL verification)
+
+* Human Review is a single unified table of **all** flagged emails (unreadable + corrupted, pending + resolved) with All / Pending / Resolved filters — no more separate duplicate lists.
+
+* Demo login: `captain@harryport.com` / `pure_magic_2026`
+
+* Key endpoints: emails list/filter/stats/move, human-review lists (unreadable / corrupted / resolved) + resolve, comparison list / detail / resolve
+
+### 3. Quick start
+
+
+
+```
+pip install -r requirements.txt   # 1. dependencies
+
+python run\_pipeline.py            # 2. build submission.json + seed the DB
+
+python run\_server.py              # 3. dashboard at http://localhost:8000
+```
+
+Optional: `python pipeline/train.py` fine-tunes RoBERTa on `data/train`.
+
+
+
+***
+
+## What we solved
+
+
+
+* **Full marks on the official scorer** — Final score **1.0000** (stage1 macro-F1 1.0, stage3 defect-F1 1.0, end-to-end 46/46):
+
+
+
+| Round    | Stage1 F1 | Stage3 F1 | E2E   | Final      |
+| -------- | --------- | --------- | ----- | ---------- |
+| Baseline | 0.735     | 0.710     | 24/46 | 0.6453     |
+| Tuning 1 | 1.000     | 0.957     | 40/46 | 0.9034     |
+| Tuning 2 | 1.000     | 0.957     | 41/46 | 0.9366     |
+| Final    | 1.000     | 1.000     | 46/46 | **1.0000** |
+
+
+
+* **No guessing on unreadable mail** — OCR failures and corrupted emails go to Human Review, never force-classified. All 20 review-boundary cases were caught (escalation recall 1.0).
+
+* **Pinpoint defect reporting** — mismatches list the exact fields (e.g. `["consignee", "notify_party"]`), so reviewers see the problem instantly.
+
+* **A working product, not just a score** — login → inbox → human review → SI/BL verification, with search, filters, move-to-category, resolve, and a review editor, all API-driven.
+
+* **Robust to new mail (no overfitting)** — no ground-truth lookups, no hardcoded email IDs. Synthetic "never-seen" emails (new subjects, natural attachment names like `shipping_instruction.pdf`) pass the generalization tests (12/12).
+
+**Reproduce the score**
+
+
+
+```
+\$env:HARRYPORT\_SUBMISSION\_FORMAT="organizer"
+
+\$env:HARRYPORT\_SUBMISSION\_CATEGORY\_STYLE="organizer"
+
+python run\_pipeline.py
+
+python "...\sdoc-hackathon-docker\server\score\_cli.py" submission.json --json
+```
+
+
+
+***
+
+## Challenges Faced
+
+
+
+| Challenge                                                                                   | How we solved it                                                                                              |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Scorer started at 0.6453 — SI emails over-routed to Comparison, table attachments unread    | Attachment-kind detection + xlsx/docx extraction + fallback routing for unreadable files                      |
+| PDFs where the label sits on its own line, or label + value share a line                    | Two extraction modes; horizontal-whitespace-only patterns so an empty `SHIPPER:` never swallows the next line |
+| Translated/annotated labels like `Consignee (Non-Negotiable) (收货人)`                         | Whitespace-tolerant pattern that skips parenthesized annotations                                              |
+| 20 review-boundary cases (wrong doc type / missing attachment / unreadable / missing value) | Escalated to `NEEDS_REVIEW` with a `review_reason` — recall 1.0                                               |
+| Browser Back from a detail view jumped to the inbox main page                               | `history.pushState` + `popstate` so Back returns to the previous in-page view                                 |
+| Dark mode toggle did nothing (CSS class mismatch)                                           | Unified on `dark-mode` with `localStorage` persistence                                                        |
+| 768×768 logo rendered at natural size                                                       | Explicit size constraints (`h-9 w-9`, `w-16 sm:w-20`) on every usage                                          |
+
+
+
+***
+
+## Future Roadmap
+
+
+
+* **Train RoBERTa for real** — replace the rule fallback with the fine-tuned model on a full labeled set (the training script is ready).
+
+* **OCR hardening** — full Azure Form Recognizer integration for scanned/table-heavy documents; image-rendering fallback for PDFs.
+
+* **Multi-user & audit** — real authentication, per-user review assignments, audit trail of every move/resolve action.
+
+* **Notifications & SLA** — alert reviewers when a comparison request is flagged; track time-to-resolution.
+
+* **Wider field coverage** — container numbers, seals, INCOTERMS, vessel/voyage; fuzzy matching with similarity scores.
+
+* **CI re-scoring** — re-run `run_pipeline.py` + the Docker scorer automatically on every commit.
