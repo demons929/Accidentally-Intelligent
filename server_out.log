@@ -1,0 +1,15 @@
+INFO:     127.0.0.1:2629 - "GET /api/human-review?include_resolved=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5119 - "GET /frontpage.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5119 - "GET /static/js/app.js?v=20260921e HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10644 - "GET /static/js/inbox.js?v=20260921e HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10644 - "GET /static/js/human_review.js?v=20260921e HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10644 - "GET /api/auth/session HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5119 - "GET /api/human-review?include_resolved=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:5075 - "GET /api/emails/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:10644 - "GET /api/emails?page_size=200 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6769 - "POST /api/human-review/email_511/resolve HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6769 - "GET /api/human-review?include_resolved=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6769 - "GET /api/emails/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:6769 - "GET /api/human-review?include_resolved=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:13131 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:9011 - "GET /favicon.ico HTTP/1.1" 404 Not Found
