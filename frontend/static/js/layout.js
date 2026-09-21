@@ -144,15 +144,13 @@
           <button onclick="closeModal('settings-modal')" class="text-navy/50 hover:text-gold"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
         <div>
-          <p class="text-sm font-bold text-navy mb-2">Theme</p>
-          <div class="space-y-2">
-            <label class="flex items-center gap-2 cursor-pointer text-sm text-navy">
-              <input type="radio" name="hp-theme" value="light" onchange="selectTheme(false)" class="accent-[#C6A15B]"> Light
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer text-sm text-navy">
-              <input type="radio" name="hp-theme" value="dark" onchange="selectTheme(true)" class="accent-[#C6A15B]"> Dark
-            </label>
-          </div>
+          <p class="text-sm font-bold text-navy mb-2">Dark Mode</p>
+          <button id="hp-theme-switch" onclick="toggleTheme(); syncThemeSwitch()" class="relative w-32 h-12 rounded-full bg-white border gold-border shadow transition-colors duration-300 flex items-center px-1.5" aria-label="Toggle dark mode">
+            <span id="hp-theme-label" class="text-xs font-extrabold text-navy/40 ml-1 select-none">OFF</span>
+            <span id="hp-theme-knob" class="absolute right-1.5 w-9 h-9 rounded-full gold-gradient shadow flex items-center justify-center transition-all duration-300">
+              <i class="fa-solid fa-moon text-navy-dark text-sm"></i>
+            </span>
+          </button>
         </div>
         <button onclick="closeModal('settings-modal')" class="w-full py-2.5 gold-gradient text-navy-dark font-black text-xs rounded-xl">Close</button>
       </div>
@@ -170,7 +168,25 @@
   }
 
   /* ---------- mount ---------- */
-  window.selectTheme = function (dark) { if (typeof applyTheme === "function") applyTheme(dark); };
+  window.syncThemeSwitch = function () {
+  const dark = document.body.classList.contains("dark-mode");
+  const sw = document.getElementById("hp-theme-switch");
+  const label = document.getElementById("hp-theme-label");
+  const knob = document.getElementById("hp-theme-knob");
+  if (!sw || !label || !knob) return;
+  if (dark) {
+    sw.classList.remove("bg-white"); sw.classList.add("bg-slate-800");
+    label.innerText = "ON"; label.classList.remove("text-navy/40"); label.classList.add("text-white/70");
+    knob.style.right = "auto"; knob.style.left = "calc(100% - 2.75rem)";
+    knob.innerHTML = '<i class="fa-solid fa-moon text-navy-dark text-sm"></i>';
+  } else {
+    sw.classList.add("bg-white"); sw.classList.remove("bg-slate-800");
+    label.innerText = "OFF"; label.classList.add("text-navy/40"); label.classList.remove("text-white/70");
+    knob.style.right = "0.375rem"; knob.style.left = "auto";
+    knob.innerHTML = '<i class="fa-solid fa-sun text-navy-dark text-sm"></i>';
+  }
+};
+window.selectTheme = function (dark) { if (typeof applyTheme === "function") { applyTheme(dark); syncThemeSwitch(); } };
   window.mountLayout = function ({ active = "inbox", title = "Inbox", subtitle } = {}) {
     const map = { inbox: "nav-inbox", review: "nav-review", comparison: "nav-comparison" };
     active = map[active] || active;
