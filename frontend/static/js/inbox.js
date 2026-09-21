@@ -84,6 +84,13 @@ function renderPager(pageCount) {
   pager.innerHTML = html;
 }
 
+function filterByCategory(category) {
+  const select = document.getElementById("category-filter");
+  if (select) select.value = category;
+  if (typeof switchView === "function") switchView("inbox");
+  loadInbox();
+}
+
 function goInboxPage(page) {
   inboxPage = page;
   const category = document.getElementById("category-filter")?.value || "All";
