@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HarryPort | Comparison Requests</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="/static/js/layout.js?v=20260921u"></script>
+<script src="/static/js/layout.js?v=20260921v"></script>
 <script>
 tailwind.config={theme:{extend:{colors:{
 navy:{DEFAULT:'#182536',dark:'#0f1824',light:'#23344a',surface:'#1c2d42'},
@@ -93,10 +93,35 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#F2E9DA;color:#182536
 .cell+.cell{border-left:1px solid rgba(198,161,91,.18)}
 .field-name{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;color:#18253699;margin-bottom:0}
 .field-value{font-size:15px;font-weight:700;color:#182536}
-</style>
+
+        /* ===================== DARK MODE ===================== */
+        body.dark-mode{background:#0f1824;color:#f2e9da}
+        body.dark-mode main,body.dark-mode #app-scroll{background:#1c2d42!important}
+        body.dark-mode .bg-white{background:#1f2937!important}
+        body.dark-mode .bg-ivory{background:#273449!important}
+        body.dark-mode .bg-ivory-light{background:#2a3a52!important}
+        body.dark-mode .text-navy,body.dark-mode [class*="text-navy/"]{color:#f3f4f6!important}
+        body.dark-mode .text-navy-dark{color:#f3f4f6!important}
+        body.dark-mode .gold-border{border-color:rgba(212,175,90,.35)!important}
+        body.dark-mode input,body.dark-mode select{background:#1f2937!important;color:#f3f4f6!important;border-color:rgba(212,175,90,.35)!important}
+        body.dark-mode input::placeholder{color:#9ca3af!important}
+        body.dark-mode .request-row:hover{background:rgba(255,255,255,.06)!important}
+        body.dark-mode #comparison-table{background:#16233a}
+        body.dark-mode #comparison-table .field-row{border-color:rgba(212,175,90,.25)!important}
+        body.dark-mode .match-row-dark{background:linear-gradient(90deg,#14302e,#18403c);color:#bfe3de}
+        body.dark-mode .match-row-dark .field-name,body.dark-mode .match-row-dark .field-value{color:#bfe3de}
+        body.dark-mode .match-row-light{background:linear-gradient(90deg,#163633,#1a4440);color:#bfe3de;border-color:rgba(120,200,190,.3)!important}
+        body.dark-mode .match-row-light .field-name,body.dark-mode .match-row-light .field-value{color:#bfe3de}
+        body.dark-mode .mismatch-row{background:linear-gradient(90deg,#3a1d1b,#4a2422);border-color:rgba(220,120,110,.4)!important}
+        body.dark-mode .mismatch-row .field-name,body.dark-mode .mismatch-row .field-value{color:#f3c7c3}
+        body.dark-mode .status.mismatch{background:#5a2a26;color:#f3b3ad;border-color:#a8554e}
+        body.dark-mode .status.incompleted{background:#4a2a28;color:#f3c7c3;border-color:#a8554e}
+        body.dark-mode .status.match,body.dark-mode .status.completed{background:#1f4a3a;color:#bfe3de;border-color:#2f6b55}
+        body.dark-mode .status.review{background:#4a3a1f;color:#f0d89a;border-color:#8a6f35}
+    </style>
 </head>
 
-<body class="h-screen w-screen flex overflow-hidden">
+<body id="app-body" class="h-screen w-screen flex overflow-hidden">
 
 <!-- SIDEBAR -->
 <aside id="hp-sidebar"></aside>
@@ -1083,6 +1108,19 @@ function goToHumanReviewPage() { window.location.href = '/frontpage.html?view=re
 /* ---------------- init ---------------- */
 
 mountLayout({ active: 'comparison', title: 'Comparison Requests', subtitle: 'Shipping Instruction / Bill of Lading' });
+const THEME_KEY = "harryport_theme";
+function applyTheme(dark){
+  const b = document.getElementById("app-body");
+  if(!b) return;
+  b.classList.toggle("dark-mode", dark);
+  try{ localStorage.setItem(THEME_KEY, dark?"dark":"light"); }catch(e){}
+  if(window.syncThemeSwitch) syncThemeSwitch();
+}
+function toggleTheme(){
+  const b = document.getElementById("app-body");
+  applyTheme(!b.classList.contains("dark-mode"));
+}
+(function(){ try{ if(localStorage.getItem(THEME_KEY)==="dark") applyTheme(true); }catch(e){} })();
 requireSession().then(() => {
   showRequests();
   loadComparisonData();
