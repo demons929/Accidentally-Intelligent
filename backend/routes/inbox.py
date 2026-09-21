@@ -75,7 +75,7 @@ def list_emails(
 @router.get("/api/emails/stats", response_model=SummaryOut)
 def email_stats(db: Session = Depends(get_db)) -> SummaryOut:
     category_counts = {category: 0 for category in CANONICAL_CATEGORIES}
-    for category, count in db.query(Email.category, Email.id).filter(Email.is_human_review.is_(False)).all():
+    for category, count in db.query(Email.category, Email.id).all():
         if category in category_counts:
             category_counts[category] += 1
 
