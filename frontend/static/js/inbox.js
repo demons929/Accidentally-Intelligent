@@ -151,3 +151,17 @@ function refreshSpamToolbar() {
     bar.classList.remove("flex");
   }
 }
+
+function openEmailDetail(emailId) {
+  const email = lastLoadedEmails.find((e) => e.email_id === emailId);
+  if (!email) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+  set("ed-sender", email.sender || "Unknown sender");
+  set("ed-received", email.received_time ? new Date(email.received_time).toLocaleString() : "—");
+  set("ed-subject", email.subject || "(no subject)");
+  set("ed-category", email.category || "—");
+  set("ed-body", email.body || email.preview || "(no body)");
+  const att = document.getElementById("ed-attachments");
+  if (att) att.innerText = (email.attachments && email.attachments.length) ? "Attachments: " + email.attachments.join(", ") : "";
+  openModal("email-detail-modal");
+}
