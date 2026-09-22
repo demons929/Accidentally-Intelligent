@@ -208,7 +208,7 @@ sequenceDiagram
 
 ### 3. Quick start
 
-**Option 0 — Try it live (zero install, fastest)**
+**Live Prototype Link**
 
 Open the deployed app: **https://harryport.onrender.com/** and log in with the demo account below. No clone, no Docker — the hosted version is exactly what we demoed.
 
